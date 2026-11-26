@@ -1402,6 +1402,126 @@
             }
         }
 
+        /* SAMPLE TOUR MODE BANNER */
+        .sample-tour-banner {
+            background: linear-gradient(135deg, var(--plum) 0%, #23283B 100%);
+            color: #FFFFFF;
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            position: relative;
+        }
+
+        .sample-tour-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .sample-tour-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sample-tour-badges {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        .sample-tour-actions {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .btn-hide-tour-banner {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #E5E7EF;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 8px;
+            padding: 6px 11px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-hide-tour-banner:hover {
+            background-color: rgba(230, 109, 85, 0.25);
+            border-color: rgba(230, 109, 85, 0.5);
+            color: #FFFFFF;
+        }
+
+        .sample-tour-hide-mobile {
+            display: none;
+        }
+
+        @media (max-width: 720px) {
+            .sample-tour-banner {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px 15px;
+                gap: 13px;
+            }
+
+            .sample-tour-header-row {
+                flex-wrap: nowrap;
+                align-items: flex-start;
+            }
+
+            .sample-tour-badges {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .sample-tour-hide-mobile {
+                display: inline-flex;
+                padding: 5px 10px;
+                font-size: 11px;
+                flex-shrink: 0;
+            }
+
+            .sample-tour-hide-desktop {
+                display: none;
+            }
+
+            .sample-tour-actions {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .sample-tour-actions .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 10px 12px !important;
+                font-size: 12.5px;
+            }
+        }
+
         @media (max-width: 580px) {
             .kpi-grid {
                 grid-template-columns: 1fr !important;
@@ -2084,31 +2204,39 @@
 
         <main class="content-wrap">
             @if(($user->has_sample_data ?? false))
-                <section id="sampleTourBannerSection" class="sample-tour-banner" style="background: linear-gradient(135deg, var(--plum) 0%, #23283B 100%); color: #FFFFFF; border-radius: var(--radius-lg); padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.12);">
-                    <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 6px;">
-                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <span class="mono" style="display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; flex-shrink: 0; background-color: var(--mustard); color: #14161F; font-size: 10.5px; font-weight: 800; padding: 3px 10px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.04em;">
-                                ✦ Sample Tour Mode
-                            </span>
-                            <span style="font-size: 11.5px; font-weight: 700; color: #5CE0B5; letter-spacing: 0.02em;">
-                                Pre-Loaded Demo Workspace • Personal Profile Protected
-                            </span>
+                <section id="sampleTourBannerSection" class="sample-tour-banner">
+                    <div class="sample-tour-content">
+                        <div class="sample-tour-header-row">
+                            <div class="sample-tour-badges">
+                                <span class="mono" style="display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; flex-shrink: 0; background-color: var(--mustard); color: #14161F; font-size: 10.5px; font-weight: 800; padding: 3px 10px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.04em;">
+                                    ✦ Sample Tour Mode
+                                </span>
+                                <span style="font-size: 11.5px; font-weight: 700; color: #5CE0B5; letter-spacing: 0.02em; line-height: 1.35;">
+                                    Pre-Loaded Demo Workspace • Personal Profile Protected
+                                </span>
+                            </div>
+                            <button type="button"
+                                    class="btn-hide-tour-banner sample-tour-hide-mobile"
+                                    onclick="hideSampleTourBanner()"
+                                    title="Hide this Sample Tour Mode card">
+                                ✕ Hide
+                            </button>
                         </div>
-                        <div style="font-size: 13px; color: #E5E7EF; line-height: 1.5;">
-                            You are exploring CediLedger with pre-loaded sample data. Take the <strong style="color: #FFFFFF;">Guided Tour</strong> to see how every module works, then click <strong style="color: #F5C469;">Reset & Start Fresh</strong> to wipe the sample database and follow the chronological setup guide with your profile details intact.
+                        <div style="font-size: 12.5px; color: #E5E7EF; line-height: 1.55;">
+                            You are exploring CediLedger with pre-loaded sample data. Take the <strong style="color: #FFFFFF;">Guided Tour</strong> to see how every module works, then click <strong style="color: #F5C469;">Reset &amp; Start Fresh</strong> to wipe the sample database and follow the chronological setup guide with your profile details intact.
                         </div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0;">
+                    <div class="sample-tour-actions">
                         <button type="button" class="btn btn-emerald btn-sm" style="padding: 8px 14px;" onclick="openGuidedTourModal(0)">
                             ✦ Start Guided Tour
                         </button>
                         <button type="button" class="btn btn-mustard btn-sm" style="padding: 8px 14px;" onclick="openResetWorkspaceModal()">
-                            ↻ Reset Database & Start Fresh
+                            ↻ Reset Database &amp; Start Fresh
                         </button>
                         <button type="button"
+                                class="btn-hide-tour-banner sample-tour-hide-desktop"
                                 onclick="hideSampleTourBanner()"
-                                title="Hide this Sample Tour Mode banner"
-                                style="background-color: rgba(255, 255, 255, 0.08); color: #D5D8E6; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 8px; padding: 7px 11px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.15s ease;">
+                                title="Hide this Sample Tour Mode banner">
                             ✕ Hide
                         </button>
                     </div>
