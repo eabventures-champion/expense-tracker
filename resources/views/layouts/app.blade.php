@@ -70,7 +70,7 @@
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             max-width: 100%;
-            overflow-x: hidden;
+            overflow-x: clip;
         }
 
         .mono {
@@ -88,16 +88,18 @@
             text-decoration: none;
         }
 
-        /* APP SHELL */
+        /* APP SHELL (LOCKED VIEWPORT WITH STATIC SIDEBAR & STATIC TOPBAR) */
         .app-shell {
             display: grid;
-            grid-template-columns: 252px 1fr;
-            min-height: 100vh;
+            grid-template-columns: 252px minmax(0, 1fr);
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
             transition: grid-template-columns 0.24s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .app-shell.sidebar-collapsed {
-            grid-template-columns: 74px 1fr;
+            grid-template-columns: 74px minmax(0, 1fr);
         }
 
         /* MOBILE SIDEBAR OVERLAY BACKDROP */
@@ -117,9 +119,8 @@
             border-right: 1px solid var(--plum-border);
             display: flex;
             flex-direction: column;
-            position: sticky;
-            top: 0;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             z-index: 50;
             transition: width 0.24s cubic-bezier(0.4, 0, 0.2, 1), transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
@@ -488,16 +489,20 @@
             }
         }
 
-        /* MAIN WORKSPACE */
+        /* MAIN WORKSPACE (STATIC HEADER AT TOP, INDEPENDENTLY SCROLLING CONTENT AREA BELOW) */
         .main-workspace {
             display: flex;
             flex-direction: column;
             min-width: 0;
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
-        /* MODERN TOP COMMAND BAR */
+        /* MODERN TOP COMMAND BAR (ALWAYS PINNED AT TOP WHEN SCROLLING) */
         .topbar {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(12px);
             color: var(--text-dark);
             padding: 12px 26px;
@@ -509,7 +514,9 @@
             flex-wrap: wrap;
             position: sticky;
             top: 0;
-            z-index: 30;
+            z-index: 40;
+            flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(20, 22, 31, 0.04);
         }
 
         .topbar-left {
@@ -1384,7 +1391,6 @@
                 grid-template-columns: minmax(0, 1fr);
                 width: 100%;
                 max-width: 100vw;
-                overflow-x: hidden;
             }
 
             .main-workspace,
