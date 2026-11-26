@@ -1734,6 +1734,44 @@
                 gap: 12px;
             }
 
+            .kpi-grid.kpi-grid-dashboard {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 9px;
+            }
+
+            .kpi-grid.kpi-grid-dashboard .kpi-cell {
+                padding: 12px 11px;
+                gap: 7px;
+            }
+
+            .kpi-grid.kpi-grid-dashboard .kpi-top {
+                gap: 4px;
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .kpi-grid.kpi-grid-dashboard .kpi-label {
+                font-size: 10.5px;
+                line-height: 1.25;
+            }
+
+            .kpi-grid.kpi-grid-dashboard .delta-tag {
+                font-size: 9px;
+                padding: 1.5px 5px;
+            }
+
+            .kpi-grid.kpi-grid-dashboard .kpi-amount {
+                font-size: 15px !important;
+                word-break: break-word;
+            }
+
+            .kpi-grid.kpi-grid-dashboard .kpi-footer {
+                font-size: 9.5px;
+                gap: 4px;
+                flex-wrap: wrap;
+                line-height: 1.3;
+            }
+
             .page-kicker {
                 display: none;
             }

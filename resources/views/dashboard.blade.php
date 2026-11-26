@@ -32,7 +32,7 @@
 </div>
 
 <!-- 8 KEY FINANCIAL INDICATORS WITH PERIOD COMPARISONS -->
-<div class="kpi-grid">
+<div class="kpi-grid kpi-grid-dashboard">
     <!-- 1. Total Expenses Today (CLICKABLE TO VIEW ITEMS MODAL) -->
     <div class="kpi-cell bg-plum" onclick="openKpiBreakdownModal('today')" style="cursor: pointer;" title="Click to view Expenses Today items">
         <div class="kpi-top">
