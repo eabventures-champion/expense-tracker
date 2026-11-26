@@ -30,6 +30,8 @@
             padding: 0;
         }
 
+        html, body { max-width: 100%; overflow-x: hidden; }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--plum-dark);
@@ -38,7 +40,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
             -webkit-font-smoothing: antialiased;
         }
 

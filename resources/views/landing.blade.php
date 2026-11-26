@@ -38,6 +38,8 @@
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
             width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
         }
 
         .mono {

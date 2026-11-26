@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AdminNewUserApprovalMail;
+use App\Mail\PasswordResetLinkMail;
 use App\Models\AppNotification;
 use App\Models\User;
 use App\Services\TwoFactorAuthService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -268,6 +272,133 @@ class AuthController extends Controller
 
         return redirect()->intended(route('dashboard'))
             ->with('success', 'Two-factor authentication verified. Welcome back, ' . $user->name . '!');
+    }
+
+    /**
+     * Show the Forgot Password request screen.
+     */
+    public function showForgotPassword(): View|RedirectResponse
+    {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+
+        return view('auth.forgot-password');
+    }
+
+    /**
+     * Generate a password reset token and email the reset link (plus provide instant recovery link if mail driver is log/array or fails).
+     */
+    public function sendResetLinkEmail(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'We could not find a CediLedger account with that email address.']);
+        }
+
+        $plainToken = Str::random(64);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'token' => Hash::make($plainToken),
+                'created_at' => now(),
+            ]
+        );
+
+        $resetUrl = route('password.reset', [
+            'token' => $plainToken,
+            'email' => $user->email,
+        ]);
+
+        $mailSent = false;
+        try {
+            Mail::to($user->email)->send(new PasswordResetLinkMail($user, $resetUrl));
+            $mailSent = !in_array(config('mail.default'), ['log', 'array'], true);
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send password reset email: ' . $e->getMessage());
+        }
+
+        $redirect = back()->with(
+            'success',
+            $mailSent
+                ? "We have emailed your password reset link to {$user->email}."
+                : "Password reset link generated for {$user->email}. You can also use the direct recovery link below."
+        );
+
+        if (!$mailSent || app()->isLocal()) {
+            $redirect->with('local_reset_url', $resetUrl);
+        }
+
+        return $redirect;
+    }
+
+    /**
+     * Display the Set New Password form for a password reset token.
+     */
+    public function showResetPassword(Request $request, string $token): View|RedirectResponse
+    {
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email', ''),
+        ]);
+    }
+
+    /**
+     * Validate the reset token and update the user's password.
+     */
+    public function resetPassword(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'We could not find a CediLedger account with that email address.']);
+        }
+
+        $tokenRecord = DB::table('password_reset_tokens')
+            ->where('email', $user->email)
+            ->first();
+
+        if (!$tokenRecord || !Hash::check($validated['token'], $tokenRecord->token)) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'This password reset link is invalid or has already been used. Please request a new link.']);
+        }
+
+        if ($tokenRecord->created_at && Carbon::parse($tokenRecord->created_at)->addMinutes(60)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'This password reset link has expired (valid for 60 minutes). Please request a new one.']);
+        }
+
+        $user->update([
+            'password' => Hash::make($validated['password']),
+            'remember_token' => Str::random(60),
+        ]);
+
+        DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+
+        return redirect()->route('login')
+            ->with('success', 'Your password has been reset! You can now sign in with your new password.');
     }
 
     /**

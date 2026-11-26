@@ -33,6 +33,11 @@
             padding: 0;
         }
 
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--plum-dark);
@@ -53,7 +58,7 @@
             width: 100%;
             max-width: 980px;
             display: grid;
-            grid-template-columns: 1.05fr 1fr;
+            grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
             background-color: var(--ivory-card);
             border-radius: 22px;
             overflow: hidden;
@@ -71,6 +76,7 @@
             justify-content: space-between;
             gap: 32px;
             position: relative;
+            min-width: 0;
         }
 
         .brand-logo {
@@ -163,6 +169,7 @@
             flex-direction: column;
             justify-content: center;
             background-color: #FFFFFF;
+            min-width: 0;
         }
 
         .form-kicker {
@@ -338,24 +345,38 @@
 
         @media (max-width: 820px) {
             body {
-                padding: 12px;
+                padding: 10px;
+                align-items: flex-start;
             }
             .auth-wrapper {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
                 border-radius: 16px;
             }
             .auth-showcase {
-                padding: 28px 24px;
-                gap: 20px;
+                padding: 22px 18px;
+                gap: 16px;
             }
             .showcase-headline {
-                font-size: 22px;
+                font-size: 20px;
+            }
+            .showcase-desc {
+                margin-bottom: 0;
+                font-size: 13px;
             }
             .feature-pills {
                 display: none;
             }
+            .showcase-footer {
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-top: 12px;
+            }
             .auth-form-panel {
-                padding: 28px 24px;
+                padding: 24px 18px;
+            }
+            .form-row-between {
+                flex-wrap: wrap;
+                gap: 8px;
             }
         }
     </style>
@@ -426,7 +447,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label class="form-label" for="password">Password</label>
+                        <a href="{{ route('password.request') }}"
+                           onclick="const em = document.getElementById('email')?.value; if(em) this.href='{{ route('password.request') }}?email=' + encodeURIComponent(em);"
+                           style="font-size: 12px; font-weight: 700; color: var(--emerald-dark); text-decoration: none;">
+                            Forgot password?
+                        </a>
+                    </div>
                     <div class="password-input-wrap">
                         <input type="password" id="password" name="password" value="{{ old('password', app()->isLocal() ? 'password123' : '') }}" class="form-control" placeholder="••••••••••••" required>
                         <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility()" id="togglePasswordBtn" aria-label="Show password" title="Show / Hide Password">

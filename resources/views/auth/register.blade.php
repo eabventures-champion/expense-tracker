@@ -32,6 +32,11 @@
             padding: 0;
         }
 
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--plum-dark);
@@ -52,7 +57,7 @@
             width: 100%;
             max-width: 1040px;
             display: grid;
-            grid-template-columns: 1fr 1.1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
             background-color: var(--ivory-card);
             border-radius: 22px;
             overflow: hidden;
@@ -69,6 +74,7 @@
             flex-direction: column;
             justify-content: space-between;
             gap: 28px;
+            min-width: 0;
         }
 
         .brand-logo {
@@ -321,12 +327,13 @@
         }
 
         @media (max-width: 820px) {
-            body { padding: 12px; }
-            .auth-wrapper { grid-template-columns: 1fr; border-radius: 16px; }
-            .auth-showcase { padding: 26px 22px; }
+            body { padding: 10px; align-items: flex-start; }
+            .auth-wrapper { grid-template-columns: minmax(0, 1fr); border-radius: 16px; }
+            .auth-showcase { padding: 22px 18px; gap: 16px; }
             .feature-pills { display: none; }
-            .auth-form-panel { padding: 26px 22px; }
-            .form-grid-2 { grid-template-columns: 1fr; gap: 0; }
+            .showcase-footer { flex-wrap: wrap; gap: 6px; padding-top: 12px; }
+            .auth-form-panel { padding: 24px 18px; min-width: 0; }
+            .form-grid-2 { grid-template-columns: minmax(0, 1fr); gap: 0; }
         }
     </style>
 </head>

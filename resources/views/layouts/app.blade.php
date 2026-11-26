@@ -62,13 +62,14 @@
             padding: 0;
         }
 
-        body {
+        html, body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--ivory);
             color: var(--text-dark);
             font-size: 13.5px;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            max-width: 100%;
             overflow-x: hidden;
         }
 
@@ -1346,7 +1347,21 @@
         @media (max-width: 920px) {
             .app-shell,
             .app-shell.sidebar-collapsed {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+
+            .main-workspace,
+            .content-wrap,
+            .section-block,
+            .kpi-grid,
+            .grid-2,
+            .grid-3,
+            .grid-sidebar-right {
+                min-width: 0;
+                max-width: 100%;
             }
 
             .sidebar {

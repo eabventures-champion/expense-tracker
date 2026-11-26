@@ -259,4 +259,54 @@ class ExampleTest extends TestCase
         // Cleanup test user
         $newUser->delete();
     }
+
+    public function test_user_can_request_password_reset_link_and_reset_password(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+
+        $user = User::factory()->create([
+            'email' => 'reset_test_' . uniqid() . '@example.com',
+            'password' => bcrypt('OldPassword123!'),
+            'approval_status' => 'approved',
+        ]);
+
+        // 1. Visit Forgot Password page
+        $this->get('/forgot-password')->assertStatus(200)->assertSee('Forgot your password?');
+
+        // 2. Request password reset link
+        $requestResponse = $this->post('/forgot-password', [
+            'email' => $user->email,
+        ]);
+        $requestResponse->assertSessionHasNoErrors();
+
+        $capturedResetUrl = null;
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\PasswordResetLinkMail::class, function ($mail) use ($user, &$capturedResetUrl) {
+            $capturedResetUrl = $mail->resetUrl;
+            return $mail->user->id === $user->id && !empty($mail->resetUrl);
+        });
+
+        $this->assertNotNull($capturedResetUrl);
+
+        // Extract token from reset URL (/reset-password/{token}?email=...)
+        $parsedPath = parse_url($capturedResetUrl, PHP_URL_PATH);
+        $segments = explode('/', trim((string) $parsedPath, '/'));
+        $token = end($segments);
+
+        // 3. Visit Reset Password form
+        $this->get($capturedResetUrl)->assertStatus(200)->assertSee('Set your new password');
+
+        // 4. Submit new password
+        $resetResponse = $this->post('/reset-password', [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'NewStrongPassword456!',
+            'password_confirmation' => 'NewStrongPassword456!',
+        ]);
+
+        $resetResponse->assertRedirect('/login');
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('NewStrongPassword456!', $user->fresh()->password));
+
+        // Cleanup
+        $user->delete();
+    }
 }
