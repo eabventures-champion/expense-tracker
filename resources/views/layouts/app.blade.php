@@ -1564,6 +1564,125 @@
                 padding: 10px 12px !important;
                 font-size: 12.5px;
             }
+
+            /* MOBILE MODALS & WALKTHROUGH TOUR ORGANIZATION */
+            .modal-backdrop {
+                padding: 10px;
+                align-items: flex-end;
+            }
+
+            .modal-box {
+                max-height: 88vh;
+                border-radius: 16px;
+            }
+
+            .modal-header {
+                padding: 13px 15px;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .modal-header h3 {
+                font-size: 14.5px !important;
+                line-height: 1.3;
+                white-space: normal;
+            }
+
+            .modal-header .btn {
+                flex-shrink: 0;
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+            .modal-body {
+                padding: 15px;
+                gap: 13px !important;
+            }
+
+            .tour-step-content-box {
+                padding: 14px 15px !important;
+                min-height: 0 !important;
+                gap: 11px !important;
+            }
+
+            .tour-step-content-box h4 {
+                font-size: 15px !important;
+                line-height: 1.3 !important;
+                margin-bottom: 7px !important;
+            }
+
+            .tour-step-content-box p {
+                font-size: 12.5px !important;
+                line-height: 1.5 !important;
+            }
+
+            .tour-nav-footer {
+                flex-direction: column-reverse;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+
+            .tour-nav-counter-row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+            }
+
+            .tour-nav-actions {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .tour-nav-actions .btn {
+                flex: 1;
+                justify-content: center;
+                white-space: normal;
+                text-align: center;
+                line-height: 1.25;
+                padding: 10px 12px;
+            }
+
+            .reset-modal-actions {
+                flex-direction: column-reverse;
+                align-items: stretch !important;
+            }
+
+            .reset-modal-actions form,
+            .reset-modal-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .roadmap-step-card {
+                flex-direction: column;
+                align-items: stretch !important;
+                padding: 12px 13px !important;
+                gap: 10px !important;
+            }
+
+            .roadmap-step-card-info {
+                min-width: 0 !important;
+            }
+
+            .roadmap-step-card > a.btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .roadmap-footer-row {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .roadmap-footer-row .btn {
+                width: 100%;
+                justify-content: center;
+                white-space: normal;
+                text-align: center;
+            }
         }
 
         @media (max-width: 580px) {
@@ -2553,13 +2672,13 @@
 <div id="guidedTourModal" class="modal-backdrop" onclick="if(event.target === this) closeGuidedTourModal()">
     <div class="modal-box" style="max-width: 640px;">
         <div class="modal-header">
-            <div>
-                <div style="font-size: 10.5px; color: #5CE0B5; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">Interactive Onboarding Walkthrough</div>
-                <h3 id="tourStepHeaderTitle" style="font-size: 17px;">Welcome to CediLedger Financial Intelligence</h3>
+            <div style="min-width: 0; flex: 1;">
+                <div style="font-size: 10px; color: #5CE0B5; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">Interactive Onboarding Walkthrough</div>
+                <h3 id="tourStepHeaderTitle" style="font-size: 16.5px; margin-top: 2px;">Welcome to CediLedger Financial Intelligence</h3>
             </div>
-            <button type="button" class="btn btn-coral btn-sm" onclick="closeGuidedTourModal()">✕ Close Tour</button>
+            <button type="button" class="btn btn-coral btn-sm" onclick="closeGuidedTourModal()">✕ Close</button>
         </div>
-        <div class="modal-body" style="display: flex; flex-direction: column; gap: 18px;">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
             <!-- Step Progress Dots -->
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
                 @for($stepIdx = 0; $stepIdx < 6; $stepIdx++)
@@ -2568,17 +2687,19 @@
             </div>
 
             <!-- Dynamic Step Body -->
-            <div id="tourStepContentBox" style="background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 14px; padding: 22px; min-height: 210px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
+            <div id="tourStepContentBox" class="tour-step-content-box" style="background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 14px; padding: 20px; min-height: 195px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
             </div>
 
             <!-- Navigation Footer -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
-                <span class="mono" id="tourStepCounterLabel" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Step 1 of 6</span>
-                <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="tour-nav-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                <div class="tour-nav-counter-row">
+                    <span class="mono" id="tourStepCounterLabel" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Step 1 of 6</span>
+                </div>
+                <div class="tour-nav-actions" style="display: flex; align-items: center; gap: 8px;">
                     <button type="button" class="btn btn-ivory" id="tourPrevBtn" onclick="prevGuidedTourStep()">← Previous</button>
                     <button type="button" class="btn btn-plum" id="tourNextBtn" onclick="nextGuidedTourStep()">Next Step →</button>
                     <button type="button" class="btn btn-mustard" id="tourResetFinishBtn" style="display: none;" onclick="closeGuidedTourModal(); openResetWorkspaceModal();">
-                        ↻ Reset Database & Start Fresh Now
+                        ↻ Reset Database &amp; Start Fresh Now
                     </button>
                 </div>
             </div>
@@ -2590,18 +2711,18 @@
 <div id="resetWorkspaceModal" class="modal-backdrop" onclick="if(event.target === this) closeResetWorkspaceModal()">
     <div class="modal-box" style="max-width: 520px;">
         <div class="modal-header">
-            <div>
-                <div style="font-size: 10.5px; color: #F5C469; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">Fresh Ledger Initialization</div>
-                <h3 style="font-size: 17px;">Reset Sample Database & Start Fresh</h3>
+            <div style="min-width: 0; flex: 1;">
+                <div style="font-size: 10px; color: #F5C469; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">Fresh Ledger Initialization</div>
+                <h3 style="font-size: 16.5px; margin-top: 2px;">Reset Sample Database &amp; Start Fresh</h3>
             </div>
             <button type="button" class="btn btn-coral btn-sm" onclick="closeResetWorkspaceModal()">✕ Close</button>
         </div>
-        <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
-            <p style="font-size: 13.5px; color: var(--text-dark); line-height: 1.55;">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px;">
+            <p style="font-size: 13px; color: var(--text-dark); line-height: 1.55;">
                 Ready to begin recording your own real financial transactions? Confirming below will wipe all pre-loaded sample transactions and reset your ledger to zero.
             </p>
 
-            <div style="background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 12px; padding: 14px 16px; font-size: 12.5px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 12px; padding: 13px 15px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
                 <div style="color: var(--coral-dark); font-weight: 700;">
                     ✕ What will be cleared:
                     <span style="font-weight: 400; color: var(--text-muted); display: block; margin-top: 2px;">
@@ -2616,7 +2737,7 @@
                 </div>
             </div>
 
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div class="reset-modal-actions" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
                 <form action="{{ route('workspace.tour.complete') }}" method="POST" style="margin: 0;">
                     @csrf
                     <button type="submit" class="btn btn-ivory">Keep Sample Data for Now</button>
@@ -2624,7 +2745,7 @@
 
                 <form action="{{ route('workspace.reset') }}" method="POST" style="margin: 0;">
                     @csrf
-                    <button type="submit" class="btn btn-emerald">✓ Confirm Reset & Launch Setup Guide</button>
+                    <button type="submit" class="btn btn-emerald">✓ Confirm Reset &amp; Launch Setup Guide</button>
                 </form>
             </div>
         </div>
@@ -2635,14 +2756,14 @@
 <div id="setupRoadmapModal" class="modal-backdrop" onclick="if(event.target === this) closeSetupRoadmapModal()">
     <div class="modal-box" style="max-width: 660px;">
         <div class="modal-header">
-            <div>
-                <div style="font-size: 10.5px; color: #5CE0B5; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">Chronological Navigating Guide</div>
-                <h3 style="font-size: 17px;">Where to Begin: Your 5-Step Fresh Ledger Setup Roadmap</h3>
+            <div style="min-width: 0; flex: 1;">
+                <div style="font-size: 10px; color: #5CE0B5; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">Chronological Navigating Guide</div>
+                <h3 style="font-size: 16.5px; margin-top: 2px;">Your 5-Step Fresh Ledger Setup Roadmap</h3>
             </div>
             <button type="button" class="btn btn-coral btn-sm" onclick="closeSetupRoadmapModal()">✕ Close</button>
         </div>
-        <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
-            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.55;">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 13px;">
+            <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
                 Your workspace is clean and your personal profile details ({{ $user->name ?? 'Profile' }} • {{ $user->currency ?? 'GH¢' }}) are intact. Follow these <strong>5 chronological steps</strong> in order so all prerequisites are in place before recording transactions:
             </p>
 
@@ -2651,19 +2772,19 @@
                     @php
                         $isNextAction = $nextPendingStep && $nextPendingStep['num'] === $sStep['num'];
                     @endphp
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 16px; border-radius: 12px; background-color: {{ $sStep['done'] ? '#F4FBF8' : ($isNextAction ? '#FDF9F0' : 'var(--ivory-alt)') }}; border: 1.5px solid {{ $sStep['done'] ? 'rgba(45,159,120,0.35)' : ($isNextAction ? 'var(--mustard)' : 'var(--ivory-border)') }}; flex-wrap: wrap;">
-                        <div style="display: flex; align-items: flex-start; gap: 12px; flex: 1; min-width: 240px;">
-                            <div class="mono" style="width: 30px; height: 30px; border-radius: 50%; background-color: {{ $sStep['done'] ? 'var(--emerald)' : ($isNextAction ? 'var(--mustard)' : 'var(--plum)') }}; color: {{ $isNextAction && !$sStep['done'] ? '#14161F' : '#FFFFFF' }}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12.5px; flex-shrink: 0; margin-top: 2px;">
+                    <div class="roadmap-step-card" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 16px; border-radius: 12px; background-color: {{ $sStep['done'] ? '#F4FBF8' : ($isNextAction ? '#FDF9F0' : 'var(--ivory-alt)') }}; border: 1.5px solid {{ $sStep['done'] ? 'rgba(45,159,120,0.35)' : ($isNextAction ? 'var(--mustard)' : 'var(--ivory-border)') }}; flex-wrap: wrap;">
+                        <div class="roadmap-step-card-info" style="display: flex; align-items: flex-start; gap: 11px; flex: 1; min-width: 240px;">
+                            <div class="mono" style="width: 28px; height: 28px; border-radius: 50%; background-color: {{ $sStep['done'] ? 'var(--emerald)' : ($isNextAction ? 'var(--mustard)' : 'var(--plum)') }}; color: {{ $isNextAction && !$sStep['done'] ? '#14161F' : '#FFFFFF' }}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; flex-shrink: 0; margin-top: 2px;">
                                 {{ $sStep['done'] ? '✓' : $sStep['num'] }}
                             </div>
-                            <div>
-                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                    <strong style="font-size: 13.5px; color: var(--text-dark);">{{ $sStep['title'] }}</strong>
-                                    <span class="mono" style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background-color: #FFFFFF; border: 1px solid var(--ivory-border); color: {{ $sStep['done'] ? 'var(--emerald-dark)' : 'var(--text-muted)' }};">
+                            <div style="min-width: 0; flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    <strong style="font-size: 13px; color: var(--text-dark);">{{ $sStep['title'] }}</strong>
+                                    <span class="mono" style="font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background-color: #FFFFFF; border: 1px solid var(--ivory-border); color: {{ $sStep['done'] ? 'var(--emerald-dark)' : 'var(--text-muted)' }};">
                                         {{ $sStep['status_text'] }}
                                     </span>
                                 </div>
-                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.45;">
+                                <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 3px; line-height: 1.45;">
                                     {{ $sStep['desc'] }}
                                 </div>
                             </div>
@@ -2675,8 +2796,8 @@
                 @endforeach
             </div>
 
-            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--ivory-border); flex-wrap: wrap; gap: 10px;">
-                <span style="font-size: 12px; color: var(--text-muted);">
+            <div class="roadmap-footer-row" style="display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--ivory-border); flex-wrap: wrap; gap: 10px;">
+                <span style="font-size: 11.5px; color: var(--text-muted);">
                     You can reopen this guide anytime via <strong>🧭 Setup Guide ({{ $completedSetupCount }}/5)</strong> in the top bar.
                 </span>
                 @if($nextPendingStep)
