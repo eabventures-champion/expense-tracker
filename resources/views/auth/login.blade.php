@@ -353,11 +353,12 @@
                 border-radius: 16px;
             }
             .auth-showcase {
-                padding: 22px 18px;
-                gap: 16px;
+                padding: 18px 18px 14px;
+                gap: 10px;
             }
             .showcase-headline {
                 font-size: 20px;
+                margin-bottom: 8px;
             }
             .showcase-desc {
                 margin-bottom: 0;
@@ -369,10 +370,11 @@
             .showcase-footer {
                 flex-wrap: wrap;
                 gap: 6px;
-                padding-top: 12px;
+                padding-top: 10px;
+                margin-top: 2px;
             }
             .auth-form-panel {
-                padding: 24px 18px;
+                padding: 22px 18px;
             }
             .form-row-between {
                 flex-wrap: wrap;

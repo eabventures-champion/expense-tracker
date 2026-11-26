@@ -129,11 +129,12 @@
         @media (max-width: 820px) {
             body { padding: 10px; align-items: flex-start; }
             .auth-wrapper { grid-template-columns: minmax(0, 1fr); border-radius: 16px; }
-            .auth-showcase { padding: 22px 18px; gap: 16px; }
-            .showcase-headline { font-size: 20px; }
+            .auth-showcase { padding: 18px 18px 14px; gap: 10px; }
+            .showcase-headline { font-size: 20px; margin-bottom: 8px; }
+            .showcase-desc { margin-bottom: 0; font-size: 13px; }
             .feature-pills { display: none; }
-            .showcase-footer { flex-wrap: wrap; gap: 6px; padding-top: 12px; }
-            .auth-form-panel { padding: 24px 18px; }
+            .showcase-footer { flex-wrap: wrap; gap: 6px; padding-top: 10px; margin-top: 2px; }
+            .auth-form-panel { padding: 22px 18px; }
         }
     </style>
 </head>
