@@ -414,8 +414,8 @@
     <div class="section-body">
         <div class="grid-2">
             <!-- Chart Panel A: Switchable Daily / Weekly / Yearly Trend -->
-            <div style="background-color: var(--ivory-alt); padding: 18px; border-radius: 12px; border: 1px solid var(--ivory-border);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px;">
+            <div style="background-color: var(--ivory-alt); padding: 18px; border-radius: 12px; border: 1px solid var(--ivory-border); min-width: 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
                     <h3 id="primaryChartHeading" style="font-size: 14px; color: var(--text-dark);">Daily Spending Trend — {{ $monthlyOverview['month_label'] }}</h3>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="mono" style="font-size: 11px; color: var(--text-muted);">Live Telemetry</span>
@@ -424,14 +424,14 @@
                         </button>
                     </div>
                 </div>
-                <div style="height: 250px; cursor: pointer;" onclick="openChartPresentationModal('primary')" title="Click to expand in fullscreen presentation mode">
-                    <canvas id="primaryHorizonChart"></canvas>
+                <div class="dashboard-chart-box" style="position: relative; width: 100%; height: 250px; min-height: 250px; cursor: pointer;" onclick="openChartPresentationModal('primary')" title="Click to expand in fullscreen presentation mode">
+                    <canvas id="primaryHorizonChart" style="display: block; width: 100%; height: 100%;"></canvas>
                 </div>
             </div>
 
             <!-- Chart Panel B: Spending by Category Doughnut + Table -->
-            <div style="background-color: var(--ivory-alt); padding: 18px; border-radius: 12px; border: 1px solid var(--ivory-border);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px;">
+            <div style="background-color: var(--ivory-alt); padding: 18px; border-radius: 12px; border: 1px solid var(--ivory-border); min-width: 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
                     <h3 style="font-size: 14px; color: var(--text-dark);">Spending by Category — {{ $monthlyOverview['month_label'] }}</h3>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="mono" style="font-size: 11.5px; font-weight: 700; color: var(--emerald);">Total: {{ $user->currency }}{{ number_format((float)$monthlyOverview['total_expenditure'], 2) }}</span>
@@ -440,11 +440,11 @@
                         </button>
                     </div>
                 </div>
-                <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; align-items: center;">
-                    <div style="height: 210px; cursor: pointer;" onclick="openChartPresentationModal('category')" title="Click to expand in fullscreen presentation mode">
-                        <canvas id="categoryDistributionChart"></canvas>
+                <div class="category-chart-split-grid" style="display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 14px; align-items: center;">
+                    <div class="dashboard-chart-box" style="position: relative; width: 100%; height: 210px; min-height: 210px; cursor: pointer;" onclick="openChartPresentationModal('category')" title="Click to expand in fullscreen presentation mode">
+                        <canvas id="categoryDistributionChart" style="display: block; width: 100%; height: 100%;"></canvas>
                     </div>
-                    <div style="max-height: 230px; overflow-y: auto;">
+                    <div style="max-height: 230px; overflow-y: auto; min-width: 0;">
                         <table class="data-table" style="font-size: 12px;">
                             <thead>
                                 <tr>
@@ -454,7 +454,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($monthlyOverview['categories'] as $catItem)
+                                @forelse($monthlyOverview['categories'] as $catItem)
                                     <tr>
                                         <td>
                                             <span class="cat-swatch" style="background-color: {{ $catItem['color'] }}; margin-right: 6px;"></span>
@@ -463,7 +463,13 @@
                                         <td class="mono" style="text-align: right; white-space: nowrap;">{{ $user->currency }}{{ number_format((float)$catItem['amount'], 2) }}</td>
                                         <td class="mono" style="text-align: right; font-weight: 600; color: var(--text-muted); white-space: nowrap;">{{ $catItem['share_pct'] }}%</td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="3" style="text-align: center; padding: 18px 10px; color: var(--text-muted);">
+                                            No category spending recorded for {{ $monthlyOverview['month_label'] }} yet.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -473,8 +479,8 @@
 
         <!-- Second Analytics Row: Annual Income vs Expenditure + Monthly Budget Utilisation -->
         <div class="grid-2" style="margin-top: 20px;">
-            <div style="background-color: var(--ivory-alt); padding: 18px; border-radius: 12px; border: 1px solid var(--ivory-border);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px;">
+            <div style="background-color: var(--ivory-alt); padding: 18px; border-radius: 12px; border: 1px solid var(--ivory-border); min-width: 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
                     <h3 style="font-size: 14px; color: var(--text-dark);">{{ $selectedYear }} Monthly Income vs Expenditure (Jan – Dec)</h3>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="mono" style="font-size: 11.5px; color: var(--emerald); font-weight: 700;">
@@ -485,8 +491,8 @@
                         </button>
                     </div>
                 </div>
-                <div style="height: 220px; cursor: pointer;" onclick="openChartPresentationModal('income_vs_expense')" title="Click to expand in fullscreen presentation mode">
-                    <canvas id="incomeVsExpenseChart"></canvas>
+                <div class="dashboard-chart-box" style="position: relative; width: 100%; height: 220px; min-height: 220px; cursor: pointer;" onclick="openChartPresentationModal('income_vs_expense')" title="Click to expand in fullscreen presentation mode">
+                    <canvas id="incomeVsExpenseChart" style="display: block; width: 100%; height: 100%;"></canvas>
                 </div>
             </div>
 
@@ -693,78 +699,84 @@
 
 <!-- FULLSCREEN CHART PRESENTATION MODAL -->
 <div id="chartPresentationModal" class="modal-backdrop" onclick="if(event.target === this) closeChartPresentationModal()">
-    <div class="modal-box" style="max-width: 96vw; width: 1380px; height: 90vh; max-height: 90vh; display: flex; flex-direction: column;">
-        <div class="modal-header" style="flex-shrink: 0; flex-wrap: wrap; gap: 12px;">
-            <div>
-                <div style="font-size: 10.5px; color: #5CE0B5; text-transform: uppercase; font-weight: 700; letter-spacing: 0.07em;">Executive Presentation Mode</div>
-                <h3 id="presentationModalTitle" style="font-size: 18px;">Spending Analytics Presentation</h3>
+    <div class="modal-box pres-modal-box" style="max-width: 96vw; width: 1380px; height: 90vh; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header pres-modal-header" style="flex-shrink: 0; flex-direction: column; align-items: stretch; gap: 10px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;">
+                <div style="min-width: 0; flex: 1;">
+                    <div style="font-size: 10px; color: #5CE0B5; text-transform: uppercase; font-weight: 700; letter-spacing: 0.07em;">Executive Presentation Mode</div>
+                    <h3 id="presentationModalTitle" style="font-size: 17px; margin-top: 2px;">Spending Analytics Presentation</h3>
+                </div>
+                <button type="button" class="btn btn-coral btn-sm" onclick="closeChartPresentationModal()" style="flex-shrink: 0;">✕ Exit</button>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <div class="pres-tabs-grid" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <button type="button" class="btn btn-sm pres-tab-btn" id="presTab_primary" onclick="switchPresentationView('primary')">1. Spending Trend</button>
                 <button type="button" class="btn btn-sm pres-tab-btn" id="presTab_category" onclick="switchPresentationView('category')">2. Category Breakdown</button>
-                <button type="button" class="btn btn-sm pres-tab-btn" id="presTab_income_vs_expense" onclick="switchPresentationView('income_vs_expense')">3. Income vs Expenditure</button>
+                <button type="button" class="btn btn-sm pres-tab-btn" id="presTab_income_vs_expense" onclick="switchPresentationView('income_vs_expense')">3. Income vs Expense</button>
                 <button type="button" class="btn btn-sm pres-tab-btn" id="presTab_budget" onclick="switchPresentationView('budget')">4. Budget Utilization</button>
-                <button type="button" class="btn btn-coral btn-sm" onclick="closeChartPresentationModal()" style="margin-left: 6px;">✕ Exit Presentation</button>
             </div>
         </div>
-        <div class="modal-body" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 24px;">
+        <div class="modal-body pres-modal-body" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 20px;">
             <!-- Sub-toolbar for Spending Trend Horizon inside Presentation Modal -->
-            <div id="presTrendHorizonBar" style="display: none; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--ivory-border); flex-wrap: wrap; gap: 10px;">
-                <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">
+            <div id="presTrendHorizonBar" class="pres-horizon-bar" style="display: none; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--ivory-border); flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
                     Switch Time Horizon:
                 </div>
-                <div style="display: flex; gap: 6px;">
-                    <button type="button" class="btn btn-sm btn-plum" id="presHorizon_daily" onclick="switchPresentationTrendHorizon('daily')">Daily Trend ({{ $monthlyOverview['month_label'] }})</button>
-                    <button type="button" class="btn btn-sm btn-ivory" id="presHorizon_weekly" onclick="switchPresentationTrendHorizon('weekly')">Weekly Breakdown ({{ $weeklyOverview['week_label'] }})</button>
-                    <button type="button" class="btn btn-sm btn-ivory" id="presHorizon_yearly" onclick="switchPresentationTrendHorizon('yearly')">Yearly Overview ({{ $selectedYear }})</button>
+                <div class="pres-horizon-btns" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-sm btn-plum" id="presHorizon_daily" onclick="switchPresentationTrendHorizon('daily')">Daily ({{ $monthlyOverview['month_label'] }})</button>
+                    <button type="button" class="btn btn-sm btn-ivory" id="presHorizon_weekly" onclick="switchPresentationTrendHorizon('weekly')">Weekly ({{ $weeklyOverview['week_label'] }})</button>
+                    <button type="button" class="btn btn-sm btn-ivory" id="presHorizon_yearly" onclick="switchPresentationTrendHorizon('yearly')">Yearly ({{ $selectedYear }})</button>
                 </div>
             </div>
 
             <!-- View 1 & 3: Single Large Canvas Container -->
-            <div id="presSingleChartWrap" style="flex: 1; min-height: 460px; position: relative; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 14px; padding: 22px;">
-                <canvas id="presentationSingleCanvas"></canvas>
+            <div id="presSingleChartWrap" class="pres-single-chart-wrap" style="flex: 1; height: 420px; min-height: 290px; position: relative; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 14px; padding: 16px;">
+                <canvas id="presentationSingleCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
             </div>
 
             <!-- View 2: Category Doughnut + Full Table Side-by-Side -->
-            <div id="presCategoryWrap" style="display: none; flex: 1; grid-template-columns: 1.05fr 1fr; gap: 24px; align-items: stretch;">
-                <div style="background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 14px; padding: 24px; display: flex; flex-direction: column; justify-content: center; min-height: 440px;">
-                    <canvas id="presentationCategoryCanvas"></canvas>
+            <div id="presCategoryWrap" class="pres-split-grid" style="display: none; flex: 1; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 18px; align-items: stretch;">
+                <div class="pres-split-canvas-card" style="position: relative; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 14px; padding: 18px; height: 380px; min-height: 260px;">
+                    <canvas id="presentationCategoryCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
                 </div>
-                <div style="background-color: #FFFFFF; border: 1px solid var(--ivory-border); border-radius: 14px; overflow-y: auto;">
-                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--ivory-border); display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="font-size: 14.5px;">Category Expenditure Ranking ({{ $monthlyOverview['month_label'] }})</strong>
-                        <span class="mono" style="font-weight: 700; color: var(--emerald); font-size: 13.5px;">Total: {{ $user->currency }}{{ number_format((float)$monthlyOverview['total_expenditure'], 2) }}</span>
+                <div style="background-color: #FFFFFF; border: 1px solid var(--ivory-border); border-radius: 14px; overflow-y: auto; min-width: 0;">
+                    <div style="padding: 14px 16px; border-bottom: 1px solid var(--ivory-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                        <strong style="font-size: 13.5px;">Category Expenditure Ranking ({{ $monthlyOverview['month_label'] }})</strong>
+                        <span class="mono" style="font-weight: 700; color: var(--emerald); font-size: 12.5px;">Total: {{ $user->currency }}{{ number_format((float)$monthlyOverview['total_expenditure'], 2) }}</span>
                     </div>
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Category</th>
-                                <th style="text-align: right;">Transactions</th>
+                                <th style="text-align: right;">Tx</th>
                                 <th style="text-align: right;">Amount</th>
                                 <th style="text-align: right;">Share</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($monthlyOverview['categories'] as $catItem)
+                            @forelse($monthlyOverview['categories'] as $catItem)
                                 <tr>
                                     <td>
-                                        <span class="cat-swatch" style="background-color: {{ $catItem['color'] }}; margin-right: 8px;"></span>
+                                        <span class="cat-swatch" style="background-color: {{ $catItem['color'] }}; margin-right: 6px;"></span>
                                         <strong>{{ $catItem['name'] }}</strong>
                                     </td>
                                     <td class="mono" style="text-align: right;">{{ $catItem['count'] }}</td>
-                                    <td class="mono" style="text-align: right; font-weight: 700;">{{ $user->currency }}{{ number_format((float)$catItem['amount'], 2) }}</td>
-                                    <td class="mono" style="text-align: right; font-weight: 600; color: var(--blue);">{{ $catItem['share_pct'] }}%</td>
+                                    <td class="mono" style="text-align: right; font-weight: 700; white-space: nowrap;">{{ $user->currency }}{{ number_format((float)$catItem['amount'], 2) }}</td>
+                                    <td class="mono" style="text-align: right; font-weight: 600; color: var(--blue); white-space: nowrap;">{{ $catItem['share_pct'] }}%</td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-muted);">No category expenditure recorded for this period yet.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <!-- View 4: Budget Utilization Full Presentation Grid -->
-            <div id="presBudgetWrap" style="display: none; flex: 1; grid-template-columns: 1.1fr 1fr; gap: 24px; align-items: stretch;">
-                <div style="background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 14px; padding: 22px; min-height: 440px;">
-                    <canvas id="presentationBudgetCanvas"></canvas>
+            <div id="presBudgetWrap" class="pres-split-grid" style="display: none; flex: 1; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; align-items: stretch;">
+                <div class="pres-split-canvas-card" style="position: relative; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 14px; padding: 18px; height: 380px; min-height: 260px;">
+                    <canvas id="presentationBudgetCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
                 </div>
                 <div style="background-color: #FFFFFF; border: 1px solid var(--ivory-border); border-radius: 14px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--ivory-border);">
@@ -1318,13 +1330,20 @@
         if (!ctx) return;
         if (presCategoryChartInstance) presCategoryChartInstance.destroy();
 
+        const hasCategoryData = Array.isArray(categoryData) && categoryData.length > 0;
+        const chartLabels = hasCategoryData ? categoryData.map(c => c.name) : ['No Spending Recorded Yet'];
+        const chartValues = hasCategoryData ? categoryData.map(c => parseFloat(c.amount) || 0) : [1];
+        const chartColors = hasCategoryData
+            ? ['#2D9F78', '#E66D55', '#E5A93C', '#4E73DF', '#D96D9B', '#646A7A', '#1E1B2E', '#238261', '#C88F28']
+            : ['#E5E7EF'];
+
         presCategoryChartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: categoryData.map(c => c.name),
+                labels: chartLabels,
                 datasets: [{
-                    data: categoryData.map(c => parseFloat(c.amount)),
-                    backgroundColor: ['#2D9F78', '#E66D55', '#E5A93C', '#4E73DF', '#D96D9B', '#646A7A', '#1E1B2E', '#238261', '#C88F28'],
+                    data: chartValues,
+                    backgroundColor: chartColors,
                     borderColor: '#FFFFFF',
                     borderWidth: 3
                 }]
@@ -1337,7 +1356,7 @@
                     legend: {
                         display: true,
                         position: 'bottom',
-                        labels: { color: '#14161F', padding: 14, font: { size: 12 } }
+                        labels: { color: '#14161F', padding: 12, font: { size: 11.5 } }
                     }
                 }
             }
@@ -1425,14 +1444,15 @@
         initPrimaryHorizonChart('daily');
 
         const catCtx = document.getElementById('categoryDistributionChart');
-        if (catCtx && categoryData.length > 0) {
+        if (catCtx) {
+            const hasCat = Array.isArray(categoryData) && categoryData.length > 0;
             new Chart(catCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: categoryData.map(c => c.name),
+                    labels: hasCat ? categoryData.map(c => c.name) : ['No Spending Recorded Yet'],
                     datasets: [{
-                        data: categoryData.map(c => parseFloat(c.amount)),
-                        backgroundColor: ['#2D9F78', '#E66D55', '#E5A93C', '#4E73DF', '#D96D9B', '#646A7A', '#1E1B2E'],
+                        data: hasCat ? categoryData.map(c => parseFloat(c.amount) || 0) : [1],
+                        backgroundColor: hasCat ? ['#2D9F78', '#E66D55', '#E5A93C', '#4E73DF', '#D96D9B', '#646A7A', '#1E1B2E'] : ['#E5E7EF'],
                         borderColor: '#FFFFFF',
                         borderWidth: 2
                     }]

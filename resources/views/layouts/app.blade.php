@@ -1800,6 +1800,72 @@
             .kpi-modal-table td {
                 padding: 9px 8px !important;
             }
+
+            /* MOBILE CHART PRESENTATION MODAL & DASHBOARD CHARTS */
+            .category-chart-split-grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+                gap: 12px !important;
+            }
+
+            .pres-modal-box {
+                height: 92dvh !important;
+                max-height: 92dvh !important;
+            }
+
+            .pres-tabs-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px !important;
+                width: 100%;
+            }
+
+            .pres-tabs-grid .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 7px 8px !important;
+                font-size: 11px !important;
+            }
+
+            .pres-modal-body {
+                padding: 12px !important;
+            }
+
+            .pres-horizon-bar {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .pres-horizon-btns {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                width: 100%;
+            }
+
+            .pres-horizon-btns .btn {
+                justify-content: center;
+                padding: 6px 4px !important;
+                font-size: 10.5px !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .pres-single-chart-wrap {
+                height: 300px !important;
+                min-height: 270px !important;
+                padding: 10px !important;
+            }
+
+            .pres-split-grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+                gap: 12px !important;
+            }
+
+            .pres-split-canvas-card {
+                height: 250px !important;
+                min-height: 240px !important;
+                padding: 12px !important;
+            }
         }
 
         @media (max-width: 580px) {
