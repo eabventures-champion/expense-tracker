@@ -1489,6 +1489,62 @@
             }
         }
 
+        .horizon-mobile-toggle-row {
+            display: none;
+        }
+
+        @media (max-width: 720px) {
+            .horizon-bar-card {
+                padding: 10px 14px !important;
+            }
+
+            .horizon-mobile-toggle-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .horizon-bar-card .horizon-filter-form {
+                display: none !important;
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid var(--ivory-border);
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+
+            .horizon-bar-card.mobile-expanded .horizon-filter-form {
+                display: flex !important;
+            }
+
+            .horizon-bar-card .horizon-desktop-label,
+            .horizon-bar-card .horizon-desktop-date {
+                display: none !important;
+            }
+
+            .horizon-bar-card .horizon-desktop-info a.btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .horizon-bar-card .horizon-controls-group {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px !important;
+            }
+
+            .horizon-bar-card .horizon-controls-group label,
+            .horizon-bar-card .horizon-controls-group input[type="date"],
+            .horizon-bar-card .horizon-controls-group button[type="submit"] {
+                grid-column: span 2;
+                width: 100%;
+            }
+        }
+
         /* SAMPLE TOUR MODE BANNER */
         .sample-tour-banner {
             background: linear-gradient(135deg, var(--plum) 0%, #23283B 100%);
