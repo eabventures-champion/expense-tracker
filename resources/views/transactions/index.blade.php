@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('kicker', 'Transactions')
+@section('kicker', $forcedType === 'expense' ? 'Expenses & Receipts' : ($forcedType === 'income' ? 'Income Records' : 'All Transactions'))
 @section('page_title', $pageTitle)
 
 @section('content')
