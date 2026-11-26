@@ -417,23 +417,32 @@
         }
 
         .btn-logout-icon {
-            width: 30px;
             height: 30px;
+            padding: 0 9px;
             border-radius: 7px;
-            border: 1px solid rgba(230, 109, 85, 0.3);
-            background-color: rgba(230, 109, 85, 0.12);
+            border: 1px solid rgba(230, 109, 85, 0.35);
+            background-color: rgba(230, 109, 85, 0.16);
             color: #FF8A73;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 5px;
             cursor: pointer;
             flex-shrink: 0;
+            font-family: inherit;
+            font-size: 11.5px;
+            font-weight: 700;
             transition: all 0.15s ease;
         }
 
         .btn-logout-icon:hover {
             background-color: var(--coral);
             color: #FFFFFF;
+            border-color: var(--coral);
+        }
+
+        .logout-btn-label {
+            display: inline;
         }
 
         /* COLLAPSED SIDEBAR STATES (DESKTOP) */
@@ -451,8 +460,14 @@
             .app-shell.sidebar-collapsed .nav-group-label,
             .app-shell.sidebar-collapsed .user-meta-text,
             .app-shell.sidebar-collapsed .quick-add-label,
-            .app-shell.sidebar-collapsed .kbd-hint {
+            .app-shell.sidebar-collapsed .kbd-hint,
+            .app-shell.sidebar-collapsed .logout-btn-label {
                 display: none;
+            }
+
+            .app-shell.sidebar-collapsed .btn-logout-icon {
+                width: 30px;
+                padding: 0;
             }
 
             .app-shell.sidebar-collapsed .quick-add-plus {
@@ -1411,8 +1426,30 @@
                 bottom: 0;
                 width: 268px;
                 height: 100vh;
+                height: 100dvh;
+                max-height: 100dvh;
                 transform: translateX(-100%);
                 box-shadow: var(--shadow-lg);
+            }
+
+            .sidebar-nav-scroll {
+                flex: 1 1 0%;
+                min-height: 0;
+            }
+
+            .sidebar-footer {
+                padding: 11px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+                background-color: #13111E;
+                border-top: 1px solid rgba(255, 255, 255, 0.14);
+            }
+
+            .btn-logout-icon {
+                background-color: var(--coral);
+                color: #FFFFFF;
+                border-color: var(--coral);
+                height: 32px;
+                padding: 0 11px;
+                box-shadow: 0 2px 8px rgba(230, 109, 85, 0.35);
             }
 
             .app-shell.mobile-nav-open .sidebar {
@@ -1941,14 +1978,15 @@
                     <div class="user-meta-role">Currency: {{ $user->currency ?? 'GH¢' }}</div>
                 </div>
             </a>
-            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+            <form action="{{ route('logout') }}" method="POST" style="margin: 0; flex-shrink: 0;">
                 @csrf
                 <button type="submit" class="btn-logout-icon" title="Sign Out">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                         <polyline points="16 17 21 12 16 7"></polyline>
                         <line x1="21" y1="12" x2="9" y2="12"></line>
                     </svg>
+                    <span class="logout-btn-label">Sign Out</span>
                 </button>
             </form>
         </div>
