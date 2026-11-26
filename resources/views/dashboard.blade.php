@@ -291,9 +291,8 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Day & Date</th>
+                                    <th>Day &amp; Date</th>
                                     <th>Transaction</th>
-                                    <th style="text-align: right;">Compounded Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -308,11 +307,23 @@
                                     @endphp
                                     <tr>
                                         <td>
-                                            <div class="mono" style="font-size: 11.5px; color: #F5C469; margin-bottom: 5px; white-space: nowrap;">
+                                            <div class="mono" style="font-size: 11.5px; color: #F5C469; margin-bottom: 4px; white-space: nowrap;">
                                                 {{ $tx['day_short'] }}, {{ $tx['formatted_date'] }}
                                                 @if($wCount > 1)
                                                     <span style="background-color: rgba(230,109,85,0.22); color: #FF8A73; font-size: 9.5px; font-weight: 800; padding: 1.5px 6px; border-radius: 9999px; margin-left: 4px;">
                                                         {{ $wCount }}x
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="mono" style="font-weight: 800; font-size: 13px; color: #FF8A73; margin-bottom: 5px; white-space: nowrap;">
+                                                {{ $user->currency }}{{ number_format($wTotal, 2) }}
+                                                @if($wCount > 1)
+                                                    <span style="font-size: 10px; color: #A3A7BA; font-weight: 600; margin-left: 4px;">
+                                                        @if(abs($wMax - $wMin) > 0.005)
+                                                            ({{ $wCount }}x • {{ $user->currency }}{{ number_format($wMin, 2) }}–{{ $user->currency }}{{ number_format($wMax, 2) }})
+                                                        @else
+                                                            ({{ $wCount }}x • {{ $user->currency }}{{ number_format($wMin, 2) }} each)
+                                                        @endif
                                                     </span>
                                                 @endif
                                             </div>
@@ -337,22 +348,10 @@
                                                 </div>
                                             @endif
                                         </td>
-                                        <td class="mono" style="text-align: right; font-weight: 700; color: #FF8A73; white-space: nowrap;">
-                                            {{ $user->currency }}{{ number_format($wTotal, 2) }}
-                                            @if($wCount > 1)
-                                                <div style="font-size: 10px; color: #A3A7BA; font-weight: 600;">
-                                                    @if(abs($wMax - $wMin) > 0.005)
-                                                        {{ $wCount }}x • {{ $user->currency }}{{ number_format($wMin, 2) }}–{{ $user->currency }}{{ number_format($wMax, 2) }}
-                                                    @else
-                                                        {{ $wCount }}x • {{ $user->currency }}{{ number_format($wMin, 2) }} each
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" style="text-align: center; padding: 16px; color: #A3A7BA;">No expenses recorded in this week block.</td>
+                                        <td colspan="2" style="text-align: center; padding: 16px; color: #A3A7BA;">No expenses recorded in this week block.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
