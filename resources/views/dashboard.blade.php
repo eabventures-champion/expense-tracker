@@ -888,43 +888,39 @@
 
             @foreach($kpiModalPeriods as $pKey => $pData)
                 <div id="kpiPane_{{ $pKey }}" class="kpi-period-pane" style="display: none; flex-direction: column; gap: 14px;">
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 12px; padding: 12px 15px;">
-                        <div>
-                            <div style="font-size: 10.5px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Recorded Items</div>
-                            <div class="mono" style="font-size: 15.5px; font-weight: 800; color: var(--text-dark); margin-top: 2px;">
+                    <div class="kpi-modal-summary-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-radius: 12px; padding: 12px 15px;">
+                        <div style="min-width: 0;">
+                            <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Recorded Items</div>
+                            <div class="mono" style="font-size: 14.5px; font-weight: 800; color: var(--text-dark); margin-top: 2px;">
                                 {{ $pData['items']->count() }} {{ \Illuminate\Support\Str::plural('Transaction', $pData['items']->count()) }}
                             </div>
                         </div>
-                        <div>
-                            <div style="font-size: 10.5px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Period Total</div>
-                            <div class="mono" style="font-size: 15.5px; font-weight: 800; color: {{ $pData['type'] === 'income' ? 'var(--emerald-dark)' : 'var(--coral-dark)' }}; margin-top: 2px;">
+                        <div style="min-width: 0;">
+                            <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Period Total</div>
+                            <div class="mono" style="font-size: 14.5px; font-weight: 800; color: {{ $pData['type'] === 'income' ? 'var(--emerald-dark)' : 'var(--coral-dark)' }}; margin-top: 2px;">
                                 {{ $user->currency }}{{ number_format((float)$pData['total'], 2) }}
                             </div>
                         </div>
-                        <div>
-                            <div style="font-size: 10.5px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Previous Period ({{ $pData['comp_label'] }})</div>
-                            <div class="mono" style="font-size: 14.5px; font-weight: 700; color: var(--text-muted); margin-top: 2px;">
+                        <div style="min-width: 0;">
+                            <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Previous Period ({{ $pData['comp_label'] }})</div>
+                            <div class="mono" style="font-size: 14px; font-weight: 700; color: var(--text-muted); margin-top: 2px;">
                                 {{ $user->currency }}{{ number_format((float)$pData['previous'], 2) }}
                             </div>
                         </div>
                     </div>
 
-                    <div class="table-wrap" style="border: 1px solid var(--ivory-border); border-radius: 12px; max-height: 410px; overflow-y: auto;">
+                    <div class="table-wrap kpi-modal-table-wrap" style="border: 1px solid var(--ivory-border); border-radius: 12px; max-height: 410px; overflow-y: auto; overflow-x: hidden;">
                         @php
                             $compoundedKpiItems = $pData['items']->groupBy(function ($itemTx) {
-                                if ($itemTx->type === 'income') {
-                                    return 'income_cat|' . ($itemTx->expense_category_id ?: strtolower(trim((string) ($itemTx->income_source ?: $itemTx->title))));
-                                }
-                                return 'expense_title|' . preg_replace('/\s+/', ' ', strtolower(trim((string) $itemTx->title)));
+                                return $itemTx->type . '_title|' . ($itemTx->expense_category_id ?: 0) . '|' . preg_replace('/\s+/', ' ', strtolower(trim((string) $itemTx->title)));
                             });
                         @endphp
-                        <table class="data-table">
+                        <table class="data-table kpi-modal-table">
                             <thead>
                                 <tr>
-                                    <th>Date & Status</th>
-                                    <th>Item & Merchant</th>
-                                    <th>Category & Method</th>
-                                    <th style="text-align: right;">Amount</th>
+                                    <th>Date &amp; Status</th>
+                                    <th>Item, Amount &amp; Merchant</th>
+                                    <th>Category &amp; Method</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -934,31 +930,28 @@
                                         $cCount = $cGroup->count();
                                         $cTotal = $cGroup->sum(fn($x) => (float) $x->amount);
                                         $cMethods = $cGroup->map(fn($x) => $x->paymentMethod?->name)->filter()->unique()->implode(', ') ?: '—';
-                                        $cDistinctTitles = $cGroup->map(fn($x) => strtolower(trim((string) $x->title)))->unique()->count();
-                                        $cIsIncomeCatGroup = $itemTx->type === 'income' && $cCount > 1 && $cDistinctTitles > 1;
-                                        $cDisplayTitle = $cIsIncomeCatGroup
-                                            ? ($cCount . ' ' . ($itemTx->category?->name ?? 'Income') . ' Inflows (Latest: ' . $itemTx->title . ')')
-                                            : $itemTx->title;
-                                        $cDatesList = $cGroup->map(fn($x) => ($cIsIncomeCatGroup ? ($x->title . ' • ') : '') . $x->transaction_date->format('d M') . ' (' . $user->currency . number_format((float)$x->amount, 2) . ')')->implode(' • ');
+                                        $cDatesList = $cGroup->map(fn($x) => $x->transaction_date->format('d M') . ' (' . $user->currency . number_format((float)$x->amount, 2) . ')')->implode(' • ');
+                                        $cMin = $cGroup->min(fn($x) => (float) $x->amount);
+                                        $cMax = $cGroup->max(fn($x) => (float) $x->amount);
                                     @endphp
                                     <tr>
-                                        <td class="mono" style="white-space: nowrap; font-size: 11.5px;">
+                                        <td class="mono" style="white-space: nowrap; font-size: 11px;">
                                             <strong>{{ $itemTx->transaction_date->format('d M Y') }}</strong>
                                             @if($cCount > 1)
                                                 <div style="margin-top: 3px;">
-                                                    <span class="mono" style="font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 9999px; background-color: {{ $itemTx->type === 'income' ? 'var(--emerald-soft)' : 'var(--coral-soft)' }}; color: {{ $itemTx->type === 'income' ? 'var(--emerald-dark)' : 'var(--coral-dark)' }}; text-transform: uppercase;">
-                                                        COMPOUNDED ({{ $cCount }}x)
+                                                    <span class="mono" style="font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 9999px; background-color: {{ $itemTx->type === 'income' ? 'var(--emerald-soft)' : 'var(--coral-soft)' }}; color: {{ $itemTx->type === 'income' ? 'var(--emerald-dark)' : 'var(--coral-dark)' }}; text-transform: uppercase;">
+                                                        {{ $cCount }}x
                                                     </span>
                                                 </div>
                                             @else
-                                                <div style="font-size: 10.5px; color: var(--text-muted);">
+                                                <div style="font-size: 10px; color: var(--text-muted);">
                                                     {{ $itemTx->transaction_time ? substr($itemTx->transaction_time, 0, 5) : '—' }}
                                                 </div>
                                             @endif
                                         </td>
                                         <td>
-                                            <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
-                                                <strong style="font-size: 12.5px; color: var(--text-dark);">{{ $cDisplayTitle }}</strong>
+                                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                                <strong style="font-size: 12.5px; color: var(--text-dark);">{{ $itemTx->title }}</strong>
                                                 <button type="button"
                                                         class="btn btn-ivory btn-sm"
                                                         style="padding: 1.5px 7px; font-size: 10px; border-radius: 9999px;"
@@ -970,17 +963,31 @@
                                             @if($itemTx->merchant_or_source)
                                                 <div style="font-size: 11px; color: var(--text-muted);">{{ $itemTx->merchant_or_source }}</div>
                                             @endif
+                                            <div style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin-top: 3px;">
+                                                <span class="mono" style="font-weight: 800; font-size: 12.5px; color: {{ $itemTx->type === 'income' ? 'var(--emerald-dark)' : 'var(--coral-dark)' }};">
+                                                    {{ $itemTx->type === 'income' ? '+' : '-' }}{{ $user->currency }}{{ number_format($cTotal, 2) }}
+                                                </span>
+                                                @if($cCount > 1)
+                                                    <span class="mono" style="font-size: 10px; color: var(--text-muted); font-weight: 600;">
+                                                        @if(abs($cMax - $cMin) > 0.005)
+                                                            ({{ $cCount }}x • {{ $user->currency }}{{ number_format($cMin, 2) }} – {{ $user->currency }}{{ number_format($cMax, 2) }})
+                                                        @else
+                                                            ({{ $cCount }}x • {{ $user->currency }}{{ number_format($cMin, 2) }} each)
+                                                        @endif
+                                                    </span>
+                                                @endif
+                                            </div>
                                             @if($cCount > 1)
-                                                <div class="mono" style="font-size: 10px; color: var(--blue); margin-top: 3px;">
-                                                    Breakdown: {{ $cDatesList }}
+                                                <div class="mono" style="font-size: 9.5px; color: var(--blue); margin-top: 2px;">
+                                                    {{ $cDatesList }}
                                                 </div>
                                             @endif
                                         </td>
                                         <td>
                                             <div>
-                                                <span class="cat-badge" style="background-color: var(--ivory-alt);">
+                                                <span class="cat-badge" style="background-color: var(--ivory-alt); white-space: normal; line-height: 1.25;">
                                                     <span class="cat-swatch" style="background-color: {{ $itemTx->category?->color ?? '#2D9F78' }};"></span>
-                                                    {{ $itemTx->category?->name ?? 'General' }}
+                                                    <span>{{ $itemTx->category?->name ?? 'General' }}</span>
                                                 </span>
                                             </div>
                                             @if($itemTx->subcategory)
@@ -992,26 +999,10 @@
                                                 Method: <strong style="color: var(--text-dark); font-weight: 600;">{{ $cMethods }}</strong>
                                             </div>
                                         </td>
-                                        <td class="mono" style="text-align: right; font-weight: 800; font-size: 13.5px; white-space: nowrap; color: {{ $itemTx->type === 'income' ? 'var(--emerald-dark)' : 'var(--coral-dark)' }};">
-                                            {{ $itemTx->type === 'income' ? '+' : '-' }}{{ $user->currency }}{{ number_format($cTotal, 2) }}
-                                            @if($cCount > 1)
-                                                @php
-                                                    $cMin = $cGroup->min(fn($x) => (float) $x->amount);
-                                                    $cMax = $cGroup->max(fn($x) => (float) $x->amount);
-                                                @endphp
-                                                <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">
-                                                    @if(abs($cMax - $cMin) > 0.005)
-                                                        {{ $cCount }}x ({{ $user->currency }}{{ number_format($cMin, 2) }} – {{ $user->currency }}{{ number_format($cMax, 2) }})
-                                                    @else
-                                                        {{ $cCount }}x ({{ $user->currency }}{{ number_format($cMin, 2) }} each)
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" style="text-align: center; padding: 28px; color: var(--text-muted);">
+                                        <td colspan="3" style="text-align: center; padding: 28px; color: var(--text-muted);">
                                             <strong>No items recorded for this period yet.</strong>
                                         </td>
                                     </tr>

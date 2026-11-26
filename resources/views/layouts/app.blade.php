@@ -1782,6 +1782,24 @@
                 white-space: normal;
                 text-align: center;
             }
+
+            /* KPI PERIOD ITEMS BREAKDOWN MODAL MOBILE FIT (NO HORIZONTAL DRIFT) */
+            .kpi-modal-summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                padding: 10px 12px !important;
+                gap: 8px !important;
+            }
+
+            .kpi-modal-summary-grid > div:last-child {
+                grid-column: span 2;
+                padding-top: 6px;
+                border-top: 1px solid var(--ivory-border);
+            }
+
+            .kpi-modal-table th,
+            .kpi-modal-table td {
+                padding: 9px 8px !important;
+            }
         }
 
         @media (max-width: 580px) {
