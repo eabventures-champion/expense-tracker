@@ -57,6 +57,49 @@
                     <button type="submit" class="btn btn-plum">Save Platform Settings</button>
                 </div>
             </form>
+
+            <!-- HEADER NAVIGATION & ONBOARDING SHORTCUTS VISIBILITY -->
+            <div style="margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--ivory-border); display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <div style="font-size: 10.5px; color: var(--emerald-dark); text-transform: uppercase; font-weight: 800; letter-spacing: 0.06em;">
+                        Interface &amp; Top Header Customization
+                    </div>
+                    <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text-dark); margin-top: 2px;">
+                        Top Header Onboarding &amp; Tour Buttons
+                    </h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                        Choose whether to show or hide the <strong>🧭 Setup Guide</strong> and <strong>✦ Guided Tour</strong> buttons in the top header bar across all pages.
+                    </p>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label for="toggle_show_setup_guide_btn" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; border-radius: 10px; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); cursor: pointer;">
+                        <div>
+                            <strong style="font-size: 13px; color: var(--text-dark); display: block;">Show "🧭 Setup Guide" in Top Header</strong>
+                            <span style="font-size: 11.5px; color: var(--text-muted);">Displays the 5-step chronological setup roadmap shortcut at the top of the screen</span>
+                        </div>
+                        <input type="checkbox"
+                               id="toggle_show_setup_guide_btn"
+                               onchange="updateHeaderShortcutVisibility('setup_guide', this.checked)"
+                               style="width: 18px; height: 18px; accent-color: var(--emerald); cursor: pointer; flex-shrink: 0;">
+                    </label>
+
+                    <label for="toggle_show_guided_tour_btn" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; border-radius: 10px; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); cursor: pointer;">
+                        <div>
+                            <strong style="font-size: 13px; color: var(--text-dark); display: block;">Show "✦ Guided Tour" in Top Header</strong>
+                            <span style="font-size: 11.5px; color: var(--text-muted);">Displays the interactive platform walkthrough button at the top of the screen</span>
+                        </div>
+                        <input type="checkbox"
+                               id="toggle_show_guided_tour_btn"
+                               onchange="updateHeaderShortcutVisibility('guided_tour', this.checked)"
+                               style="width: 18px; height: 18px; accent-color: var(--plum); cursor: pointer; flex-shrink: 0;">
+                    </label>
+                </div>
+
+                <div id="headerVisibilitySavedNotice" style="display: none; font-size: 12px; font-weight: 700; color: var(--emerald-dark); background-color: #F4FBF8; border: 1px solid rgba(45, 159, 120, 0.3); padding: 8px 12px; border-radius: 8px;">
+                    ✓ Top header button preferences updated immediately.
+                </div>
+            </div>
         </div>
     </section>
 
@@ -147,3 +190,56 @@
     </section>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    const HEADER_SETUP_BTN_HIDE_KEY = 'cediledger_hide_header_setup_btn_{{ $user->id }}';
+    const HEADER_TOUR_BTN_HIDE_KEY = 'cediledger_hide_header_tour_btn_{{ $user->id }}';
+
+    function syncHeaderShortcutCheckboxes() {
+        const setupCheckbox = document.getElementById('toggle_show_setup_guide_btn');
+        const tourCheckbox = document.getElementById('toggle_show_guided_tour_btn');
+        try {
+            if (setupCheckbox) {
+                setupCheckbox.checked = localStorage.getItem(HEADER_SETUP_BTN_HIDE_KEY) !== '1';
+            }
+            if (tourCheckbox) {
+                tourCheckbox.checked = localStorage.getItem(HEADER_TOUR_BTN_HIDE_KEY) !== '1';
+            }
+        } catch (e) {}
+    }
+
+    function updateHeaderShortcutVisibility(which, shouldShow) {
+        try {
+            if (which === 'setup_guide') {
+                if (shouldShow) {
+                    localStorage.removeItem(HEADER_SETUP_BTN_HIDE_KEY);
+                } else {
+                    localStorage.setItem(HEADER_SETUP_BTN_HIDE_KEY, '1');
+                }
+            } else if (which === 'guided_tour') {
+                if (shouldShow) {
+                    localStorage.removeItem(HEADER_TOUR_BTN_HIDE_KEY);
+                } else {
+                    localStorage.setItem(HEADER_TOUR_BTN_HIDE_KEY, '1');
+                }
+            }
+        } catch (e) {}
+
+        if (typeof applyTopbarGuideButtonsVisibility === 'function') {
+            applyTopbarGuideButtonsVisibility();
+        }
+
+        const notice = document.getElementById('headerVisibilitySavedNotice');
+        if (notice) {
+            notice.style.display = 'block';
+            clearTimeout(window._headerVisTimer);
+            window._headerVisTimer = setTimeout(function () {
+                notice.style.display = 'none';
+            }, 2600);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', syncHeaderShortcutCheckboxes);
+</script>
+@endpush

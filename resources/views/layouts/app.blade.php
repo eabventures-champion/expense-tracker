@@ -2292,10 +2292,18 @@
                         ✦ Tour & Reset
                     </button>
                 @else
-                    <button type="button" class="btn btn-emerald btn-sm" onclick="openSetupRoadmapModal()" title="View Chronological Fresh-Start Setup Guide">
+                    <button type="button"
+                            id="topbarSetupGuideBtn"
+                            class="btn btn-emerald btn-sm"
+                            onclick="openSetupRoadmapModal()"
+                            title="View Chronological Fresh-Start Setup Guide">
                         🧭 Setup Guide ({{ $completedSetupCount }}/5)
                     </button>
-                    <button type="button" class="btn btn-plum btn-sm" onclick="openGuidedTourModal(0)" title="Launch Interactive Platform Tour">
+                    <button type="button"
+                            id="topbarGuidedTourBtn"
+                            class="btn btn-plum btn-sm"
+                            onclick="openGuidedTourModal(0)"
+                            title="Launch Interactive Platform Tour">
                         ✦ Guided Tour
                     </button>
                 @endif
@@ -3220,6 +3228,22 @@
     // Ensure the active link in the sidebar is scrolled into view on load
     const SAMPLE_BANNER_HIDE_KEY = 'cediledger_hide_sample_banner_{{ $currentAuthId }}';
     const FRESH_GUIDE_HIDE_KEY = 'cediledger_hide_fresh_guide_{{ $currentAuthId }}';
+    const TOPBAR_SETUP_BTN_HIDE_KEY = 'cediledger_hide_header_setup_btn_{{ $currentAuthId }}';
+    const TOPBAR_TOUR_BTN_HIDE_KEY = 'cediledger_hide_header_tour_btn_{{ $currentAuthId }}';
+
+    function applyTopbarGuideButtonsVisibility() {
+        try {
+            const setupBtn = document.getElementById('topbarSetupGuideBtn');
+            const tourBtn = document.getElementById('topbarGuidedTourBtn');
+            if (setupBtn) {
+                setupBtn.style.display = localStorage.getItem(TOPBAR_SETUP_BTN_HIDE_KEY) === '1' ? 'none' : '';
+            }
+            if (tourBtn) {
+                tourBtn.style.display = localStorage.getItem(TOPBAR_TOUR_BTN_HIDE_KEY) === '1' ? 'none' : '';
+            }
+        } catch (e) {}
+    }
+    applyTopbarGuideButtonsVisibility();
 
     function hideSampleTourBanner() {
         const banner = document.getElementById('sampleTourBannerSection');
@@ -3250,6 +3274,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        applyTopbarGuideButtonsVisibility();
         try {
             if (localStorage.getItem(SAMPLE_BANNER_HIDE_KEY) === '1') {
                 const banner = document.getElementById('sampleTourBannerSection');
