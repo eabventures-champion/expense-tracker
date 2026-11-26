@@ -542,6 +542,40 @@
             white-space: nowrap;
         }
 
+        .topbar-title-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .topbar-title-link:hover {
+            color: var(--emerald-dark);
+        }
+
+        .topbar-title-mobile {
+            display: none;
+        }
+
+        .topbar-mobile-brand-mark {
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            background-color: var(--emerald);
+            color: #FFFFFF;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(45, 159, 120, 0.28);
+        }
+
         .topbar-right {
             display: flex;
             align-items: center;
@@ -1388,7 +1422,17 @@
             }
 
             .topbar-title {
-                font-size: 15.5px;
+                font-size: 15px;
+            }
+
+            .topbar-title-desktop {
+                display: none;
+            }
+
+            .topbar-title-mobile {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
             }
 
             .content-wrap {
@@ -1968,7 +2012,17 @@
                     </svg>
                 </button>
                 <span class="page-kicker">@yield('kicker', 'OVERVIEW')</span>
-                <h1 class="topbar-title">@yield('page_title', 'Executive Financial Overview')</h1>
+                <h1 class="topbar-title">
+                    <a href="{{ route('dashboard') }}" class="topbar-title-link" title="Go to Dashboard">
+                        <span class="topbar-title-desktop">@yield('page_title', 'Executive Financial Overview')</span>
+                        <span class="topbar-title-mobile">
+                            <span class="topbar-mobile-brand-mark">GH¢</span>
+                            <span>CediLedger</span>
+                            <span style="color: var(--text-muted); font-weight: 500;">•</span>
+                            <span style="color: var(--emerald-dark); font-weight: 700;">@yield('kicker', 'Dashboard')</span>
+                        </span>
+                    </a>
+                </h1>
             </div>
             <div class="topbar-right">
                 @if(($user->has_sample_data ?? false))
