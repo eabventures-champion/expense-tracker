@@ -4,10 +4,24 @@
 @section('page_title', 'Daily, Weekly, Monthly & Yearly Spending Intelligence')
 
 @section('content')
-<!-- HORIZON SELECTOR TABS & DYNAMIC DATE PICKER -->
-<div class="section-block theme-ivory" style="padding: 14px 20px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
-        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+<!-- HORIZON SELECTOR TABS & DYNAMIC DATE PICKER (COLLAPSIBLE IN MOBILE VIEW) -->
+<div class="section-block theme-ivory horizon-bar-card" id="trackingHorizonCard" style="padding: 14px 20px;">
+    <div class="horizon-mobile-toggle-row" onclick="toggleTrackingHorizonBar()">
+        <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+            <span id="trackingHorizonChevron" class="mono" style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; background-color: var(--ivory); border: 1px solid var(--ivory-border); font-size: 11px; font-weight: 800; color: var(--plum); flex-shrink: 0;">
+                ▸
+            </span>
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 800; white-space: nowrap;">
+                Active Horizon
+            </span>
+        </div>
+        <button type="button" id="trackingHorizonToggleBtn" class="btn btn-ivory btn-sm" style="padding: 3px 9px; font-size: 10.5px; border-radius: 9999px; font-weight: 700; flex-shrink: 0;">
+            Change Date ▾
+        </button>
+    </div>
+
+    <div class="horizon-collapsible-body" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+        <div class="tracking-tabs-group" style="display: flex; gap: 6px; flex-wrap: wrap;">
             <a href="{{ route('tracking.index', ['tab' => 'explorer', 'year' => $year, 'month' => $month, 'date' => $date]) }}"
                class="btn {{ $tab === 'explorer' ? 'btn-plum' : 'btn-ivory' }}">
                 Breakdown Explorer
@@ -30,7 +44,7 @@
             </a>
         </div>
 
-        <form method="GET" action="{{ route('tracking.index') }}" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <form method="GET" action="{{ route('tracking.index') }}" class="horizon-controls-group" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <input type="hidden" name="tab" value="{{ $tab }}">
             <input type="date" name="date" value="{{ $date }}" class="form-control mono" style="padding: 6px 10px; font-size: 12px;">
             <select name="month" class="form-control" style="padding: 6px 10px; font-size: 12px;">
@@ -522,3 +536,24 @@
     </div>
 @endif
 @endsection
+
+@push('scripts')
+<script>
+    function toggleTrackingHorizonBar() {
+        const card = document.getElementById('trackingHorizonCard');
+        const chevron = document.getElementById('trackingHorizonChevron');
+        const btn = document.getElementById('trackingHorizonToggleBtn');
+        if (!card) return;
+
+        const isExpanded = card.classList.toggle('mobile-expanded');
+        if (chevron) {
+            chevron.textContent = isExpanded ? '▾' : '▸';
+            chevron.style.backgroundColor = isExpanded ? 'var(--emerald-soft)' : 'var(--ivory)';
+            chevron.style.color = isExpanded ? 'var(--emerald-dark)' : 'var(--plum)';
+        }
+        if (btn) {
+            btn.textContent = isExpanded ? 'Hide ▴' : 'Change Date ▾';
+        }
+    }
+</script>
+@endpush

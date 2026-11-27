@@ -1507,7 +1507,8 @@
                 user-select: none;
             }
 
-            .horizon-bar-card .horizon-filter-form {
+            .horizon-bar-card .horizon-filter-form,
+            .horizon-bar-card .horizon-collapsible-body {
                 display: none !important;
                 margin-top: 12px;
                 padding-top: 12px;
@@ -1517,8 +1518,27 @@
                 gap: 10px !important;
             }
 
-            .horizon-bar-card.mobile-expanded .horizon-filter-form {
+            .horizon-bar-card.mobile-expanded .horizon-filter-form,
+            .horizon-bar-card.mobile-expanded .horizon-collapsible-body {
                 display: flex !important;
+            }
+
+            .horizon-bar-card .tracking-tabs-group {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px !important;
+                width: 100%;
+            }
+
+            .horizon-bar-card .tracking-tabs-group a.btn:first-child {
+                grid-column: span 2;
+            }
+
+            .horizon-bar-card .tracking-tabs-group a.btn {
+                width: 100%;
+                justify-content: center;
+                padding: 7px 10px;
+                font-size: 11.5px;
             }
 
             .horizon-bar-card .horizon-desktop-label,

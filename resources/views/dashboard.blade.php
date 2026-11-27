@@ -14,9 +14,6 @@
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 800; white-space: nowrap;">
                 Active Horizon
             </span>
-            <span class="mono" style="background-color: var(--ivory); color: var(--plum); padding: 3px 9px; border-radius: 9999px; border: 1px solid var(--ivory-border); font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}
-            </span>
         </div>
         <button type="button" id="horizonMobileToggleBtn" class="btn btn-ivory btn-sm" style="padding: 3px 9px; font-size: 10.5px; border-radius: 9999px; font-weight: 700; flex-shrink: 0;">
             Change Date ▾
