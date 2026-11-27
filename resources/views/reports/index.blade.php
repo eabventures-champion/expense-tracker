@@ -82,12 +82,22 @@
     <div class="kpi-cell bg-blue">
         <div class="kpi-label">Net Cash Flow Position</div>
         <div class="kpi-amount">{{ $user->currency }}{{ number_format((float)$netBalance, 2) }}</div>
-        <div class="kpi-footer"><span>Reconciled Ledger Balance</span></div>
+        <div class="kpi-footer">
+            <span>
+                @if((float)($incomeFundedSavings ?? 0) > 0)
+                    Gross before savings: {{ $user->currency }}{{ number_format((float)($grossBalance ?? $netBalance), 2) }}
+                @else
+                    Reconciled Ledger Balance
+                @endif
+            </span>
+        </div>
     </div>
     <div class="kpi-cell bg-mustard">
         <div class="kpi-label">Explicit Savings Recorded</div>
         <div class="kpi-amount">{{ $user->currency }}{{ number_format((float)$explicitSavings, 2) }}</div>
-        <div class="kpi-footer"><span>Dedicated Savings Transfers</span></div>
+        <div class="kpi-footer">
+            <span>From Income: {{ $user->currency }}{{ number_format((float)($incomeFundedSavings ?? 0), 2) }} • Free: {{ $user->currency }}{{ number_format((float)($freeCapitalSavings ?? 0), 2) }}</span>
+        </div>
     </div>
 </div>
 

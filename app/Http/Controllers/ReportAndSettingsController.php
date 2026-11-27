@@ -49,8 +49,11 @@ class ReportAndSettingsController extends Controller
             }
         }
 
-        $netBalance = UnifiedFinancialEngine::sub($totalIncome, $totalExpenses);
+        $grossBalance = UnifiedFinancialEngine::sub($totalIncome, $totalExpenses);
         $explicitSavings = $this->engine->sumExplicitSavings($user->id, $startDate, $endDate);
+        $incomeFundedSavings = $this->engine->sumIncomeFundedSavings($user->id, $startDate, $endDate);
+        $freeCapitalSavings = $this->engine->sumFreeCapitalSavings($user->id, $startDate, $endDate);
+        $netBalance = UnifiedFinancialEngine::sub($grossBalance, $incomeFundedSavings);
 
         $categorySummary = UnifiedFinancialEngine::assignDistinctCategoryColors(
             $transactions->where('type', 'expense')
@@ -91,8 +94,11 @@ class ReportAndSettingsController extends Controller
             'transactions',
             'totalExpenses',
             'totalIncome',
+            'grossBalance',
             'netBalance',
             'explicitSavings',
+            'incomeFundedSavings',
+            'freeCapitalSavings',
             'categorySummary',
             'monthlyOverview',
             'yearlyOverview',
@@ -131,7 +137,17 @@ class ReportAndSettingsController extends Controller
                 $totalIncome = UnifiedFinancialEngine::add($totalIncome, (string) $tx->amount);
             }
         }
-        $netBalance = UnifiedFinancialEngine::sub($totalIncome, $totalExpenses);
+        $grossBalance = UnifiedFinancialEngine::sub($totalIncome, $totalExpenses);
+        $explicitSavings = $this->engine->sumExplicitSavings($user->id, $startDate, $endDate);
+        $incomeFundedSavings = $this->engine->sumIncomeFundedSavings($user->id, $startDate, $endDate);
+        $freeCapitalSavings = $this->engine->sumFreeCapitalSavings($user->id, $startDate, $endDate);
+        $netBalance = UnifiedFinancialEngine::sub($grossBalance, $incomeFundedSavings);
+
+        $savingsRecords = \App\Models\SavingsRecord::with(['financialGoal', 'paymentMethod'])
+            ->where('user_id', $user->id)
+            ->whereBetween('record_date', [$startDate, $endDate])
+            ->orderBy('record_date')
+            ->get();
 
         if ($format === 'pdf') {
             return view('reports.pdf', compact(
@@ -139,9 +155,14 @@ class ReportAndSettingsController extends Controller
                 'startDate',
                 'endDate',
                 'transactions',
+                'savingsRecords',
                 'totalExpenses',
                 'totalIncome',
-                'netBalance'
+                'grossBalance',
+                'netBalance',
+                'explicitSavings',
+                'incomeFundedSavings',
+                'freeCapitalSavings'
             ));
         }
 
@@ -152,9 +173,14 @@ class ReportAndSettingsController extends Controller
                 'startDate',
                 'endDate',
                 'transactions',
+                'savingsRecords',
                 'totalExpenses',
                 'totalIncome',
-                'netBalance'
+                'grossBalance',
+                'netBalance',
+                'explicitSavings',
+                'incomeFundedSavings',
+                'freeCapitalSavings'
             ))->render();
 
             return response($content, 200, [
@@ -165,13 +191,13 @@ class ReportAndSettingsController extends Controller
 
         // Default CSV Stream
         $fileName = "CediLedger_Transactions_{$startDate}_to_{$endDate}.csv";
-        return new StreamedResponse(function () use ($transactions, $user, $totalIncome, $totalExpenses, $netBalance, $startDate, $endDate) {
+        return new StreamedResponse(function () use ($transactions, $user, $totalIncome, $totalExpenses, $explicitSavings, $netBalance, $startDate, $endDate) {
             $handle = fopen('php://output', 'w');
             // UTF-8 BOM for Excel compatibility
             fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, ['CEDILEDGER PERSONAL FINANCIAL INTELLIGENCE REPORT']);
             fputcsv($handle, ['Reporting Period', "{$startDate} to {$endDate}", 'Currency', $user->currency]);
-            fputcsv($handle, ['Total Income', $totalIncome, 'Total Expenses', $totalExpenses, 'Net Cash Flow', $netBalance]);
+            fputcsv($handle, ['Total Income', $totalIncome, 'Total Expenses', $totalExpenses, 'Explicit Savings', $explicitSavings, 'Net Cash Flow', $netBalance]);
             fputcsv($handle, []);
             fputcsv($handle, ['Date', 'Time', 'Reference', 'Title', 'Type', 'Category', 'Subcategory', 'Payment Method', 'Merchant / Source', 'Amount (' . $user->currency . ')']);
 

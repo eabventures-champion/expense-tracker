@@ -12,6 +12,8 @@
     <Cell><Data ss:Type="Number">{{ $totalIncome }}</Data></Cell>
     <Cell><Data ss:Type="String">Total Expenses</Data></Cell>
     <Cell><Data ss:Type="Number">{{ $totalExpenses }}</Data></Cell>
+    <Cell><Data ss:Type="String">Explicit Savings</Data></Cell>
+    <Cell><Data ss:Type="Number">{{ $explicitSavings ?? '0.00' }}</Data></Cell>
     <Cell><Data ss:Type="String">Net Cash Flow</Data></Cell>
     <Cell><Data ss:Type="Number">{{ $netBalance }}</Data></Cell>
    </Row>

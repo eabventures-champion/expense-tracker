@@ -5,13 +5,18 @@
     <title>CediLedger Financial Statement ({{ $startDate }} to {{ $endDate }})</title>
     <style>
         body { font-family: 'Inter', Arial, sans-serif; color: #1E1F22; background: #FFFFFF; padding: 28px; font-size: 12px; }
-        .header { background-color: #29243D; color: #F3EFE8; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #319B79; }
-        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
-        .summary-box { padding: 12px; border: 1.5px solid #292B30; background-color: #F3EFE8; }
+        .header { background-color: #29243D; color: #F3EFE8; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #319B79; flex-wrap: wrap; gap: 12px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+        .summary-box { padding: 12px 14px; border: 1.5px solid #292B30; background-color: #F3EFE8; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; }
+        .summary-sub { font-size: 10px; color: #5A5D68; margin-top: 2px; }
         table { width: 100%; border-collapse: collapse; margin-top: 12px; }
         th { background-color: #292B30; color: #F3EFE8; text-align: left; padding: 8px; font-size: 11px; text-transform: uppercase; }
         td { padding: 7px 8px; border-bottom: 1px solid #D6CFC2; }
         .mono { font-family: Consolas, monospace; }
+        @media (max-width: 720px) {
+            body { padding: 14px; }
+            .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
         @media print { .no-print { display: none; } }
     </style>
 </head>
@@ -34,14 +39,30 @@
         <div class="summary-box">
             <div style="font-size:10px;text-transform:uppercase;font-weight:700;">Total Recorded Income</div>
             <div class="mono" style="font-size:18px;font-weight:700;color:#319B79;">{{ $user->currency }}{{ number_format((float)$totalIncome, 2) }}</div>
+            <div class="summary-sub">Reconciled period inflows</div>
         </div>
         <div class="summary-box">
             <div style="font-size:10px;text-transform:uppercase;font-weight:700;">Total Recorded Expenditure</div>
             <div class="mono" style="font-size:18px;font-weight:700;color:#E66D55;">{{ $user->currency }}{{ number_format((float)$totalExpenses, 2) }}</div>
+            <div class="summary-sub">{{ $transactions->where('type', 'expense')->count() }} expense transaction(s)</div>
+        </div>
+        <div class="summary-box">
+            <div style="font-size:10px;text-transform:uppercase;font-weight:700;">Explicit Savings Recorded</div>
+            <div class="mono" style="font-size:18px;font-weight:700;color:#C88F28;">{{ $user->currency }}{{ number_format((float)($explicitSavings ?? 0), 2) }}</div>
+            <div class="summary-sub mono">
+                From Income: {{ $user->currency }}{{ number_format((float)($incomeFundedSavings ?? 0), 2) }} • Free: {{ $user->currency }}{{ number_format((float)($freeCapitalSavings ?? 0), 2) }}
+            </div>
         </div>
         <div class="summary-box">
             <div style="font-size:10px;text-transform:uppercase;font-weight:700;">Net Cash Flow Position</div>
             <div class="mono" style="font-size:18px;font-weight:700;color:#29243D;">{{ $user->currency }}{{ number_format((float)$netBalance, 2) }}</div>
+            <div class="summary-sub mono">
+                @if((float)($incomeFundedSavings ?? 0) > 0)
+                    Gross before savings: {{ $user->currency }}{{ number_format((float)($grossBalance ?? $netBalance), 2) }}
+                @else
+                    Income minus expenditure
+                @endif
+            </div>
         </div>
     </div>
 
@@ -71,5 +92,39 @@
             @endforeach
         </tbody>
     </table>
+
+    @if(isset($savingsRecords) && $savingsRecords->isNotEmpty())
+        <h3 style="margin: 22px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: #29243D;">
+            Explicit Savings Vault Transfers ({{ $savingsRecords->count() }})
+        </h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Vault / Account</th>
+                    <th>Transfer Title</th>
+                    <th>Linked Financial Goal</th>
+                    <th>Funding Source</th>
+                    <th>Action</th>
+                    <th style="text-align:right;">Amount ({{ $user->currency }})</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($savingsRecords as $sr)
+                    <tr>
+                        <td class="mono">{{ $sr->record_date->format('Y-m-d') }}</td>
+                        <td>{{ $sr->vault_or_account ?: 'Primary Savings Vault' }}</td>
+                        <td><strong>{{ $sr->title }}</strong></td>
+                        <td>{{ $sr->financialGoal?->title ?? 'General Reserve' }}</td>
+                        <td>{{ ($sr->funding_source ?? 'monthly_income') === 'free_capital' ? 'Free / External Capital' : 'From Monthly Income' }}</td>
+                        <td class="mono">{{ strtoupper($sr->action_type) }}</td>
+                        <td class="mono" style="text-align:right;font-weight:700;">
+                            {{ $sr->action_type === 'withdrawal' ? '-' : '+' }}{{ number_format((float)$sr->amount, 2) }}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 </body>
 </html>
