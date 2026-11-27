@@ -6,19 +6,37 @@
 @section('content')
 <!-- FULL-WIDTH CONFIGURED CATEGORIES & SUBCATEGORIES CARD -->
 <section class="section-block theme-ivory">
-    <div class="section-header">
+    <div class="section-header categories-card-header">
         @php
             $expenseCatCount = $categories->where('type', 'expense')->count();
             $incomeCatCount = $categories->where('type', 'income')->count();
             $totalSubcatCount = $categories->sum(fn($c) => $c->subcategories->count());
         @endphp
-        <div>
-            <h2 class="section-title">Configured Expense & Income Categories ({{ $categories->count() }})</h2>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
-                {{ $expenseCatCount }} expense {{ \Illuminate\Support\Str::plural('category', $expenseCatCount) }} + {{ $incomeCatCount }} income {{ \Illuminate\Support\Str::plural('category', $incomeCatCount) }} ({{ $totalSubcatCount }} {{ \Illuminate\Support\Str::plural('subcategory', $totalSubcatCount) }}) • Ranked by highest Recorded Spend first
+        <div class="categories-header-info" style="min-width: 0; flex: 1;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                <h2 class="section-title categories-main-title" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span>Configured Expense &amp; Income Categories</span>
+                    <span class="mono" style="font-size: 11px; font-weight: 800; padding: 2px 9px; border-radius: 9999px; background-color: var(--plum); color: #FFFFFF;">
+                        {{ $categories->count() }}
+                    </span>
+                </h2>
+            </div>
+            <div class="categories-meta-pills" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                <span class="mono" style="font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 9999px; background-color: var(--coral-soft); color: var(--coral-dark);">
+                    {{ $expenseCatCount }} Expense
+                </span>
+                <span class="mono" style="font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 9999px; background-color: var(--emerald-soft); color: var(--emerald-dark);">
+                    {{ $incomeCatCount }} Income
+                </span>
+                <span class="mono" style="font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 9999px; background-color: var(--ivory); border: 1px solid var(--ivory-border); color: var(--plum);">
+                    {{ $totalSubcatCount }} {{ \Illuminate\Support\Str::plural('Subcategory', $totalSubcatCount) }}
+                </span>
+                <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); color: var(--text-muted);">
+                    ↓ Ranked by Spend
+                </span>
             </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div class="categories-header-actions" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <button type="button" class="btn btn-emerald btn-sm" onclick="openCategoryModal()">+ Create Custom Category</button>
             <button type="button" class="btn btn-plum btn-sm" onclick="openSubcategoryModal()">+ Add Subcategory</button>
         </div>

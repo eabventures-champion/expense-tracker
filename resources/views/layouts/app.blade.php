@@ -1959,6 +1959,48 @@
             .kpi-grid.kpi-grid-3 {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
+
+            .categories-card-header {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 11px !important;
+            }
+
+            .categories-main-title {
+                font-size: 13.5px !important;
+                justify-content: space-between;
+                width: 100%;
+                flex-wrap: nowrap !important;
+            }
+
+            .categories-meta-pills {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px !important;
+            }
+
+            .categories-meta-pills > span {
+                text-align: center;
+                justify-content: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .categories-header-actions {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px !important;
+                width: 100%;
+            }
+
+            .categories-header-actions .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 7px 8px !important;
+                font-size: 11px !important;
+                white-space: nowrap;
+            }
         }
 
         @media (max-width: 580px) {
