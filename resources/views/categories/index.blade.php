@@ -297,8 +297,18 @@
 @endsection
 
 @push('scripts')
+@php
+    $existingCategoriesCatalog = $categories->map(function ($c) {
+        return [
+            'id' => $c->id,
+            'name' => $c->name,
+            'type' => $c->type,
+            'color' => strtoupper((string) $c->color),
+        ];
+    })->values();
+@endphp
 <script>
-    const existingCategoriesCatalog = @json($categories->map(fn($c) => ['id' => $c->id, 'name' => $c->name, 'type' => $c->type, 'color' => strtoupper((string)$c->color)])->values());
+    const existingCategoriesCatalog = @json($existingCategoriesCatalog);
     let activeEditCategoryId = null;
 
     function normalizeCategoryName(str) {
