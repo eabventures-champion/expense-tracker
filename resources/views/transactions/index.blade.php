@@ -29,14 +29,14 @@
             <h3 class="section-title">Income Streams Breakdown</h3>
         </div>
         <div class="section-body">
-            <div class="form-grid">
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
                 @foreach($incomeBreakdown as $ib)
-                    <div style="background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-left: 4px solid var(--emerald); border-radius: 10px; padding: 14px;">
-                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">{{ $ib->income_source ?: 'General Income' }}</div>
-                        <div class="mono" style="font-size: 18px; font-weight: 700; color: var(--text-dark); margin: 4px 0;">
+                    <div style="background-color: var(--ivory-alt); border: 1px solid var(--ivory-border); border-left: 4px solid var(--emerald); border-radius: 10px; padding: 12px 11px; min-width: 0;">
+                        <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; line-height: 1.25; word-break: break-word;">{{ $ib->income_source ?: 'General Income' }}</div>
+                        <div class="mono" style="font-size: 15.5px; font-weight: 700; color: var(--text-dark); margin: 4px 0; word-break: break-word;">
                             {{ $user->currency }}{{ number_format((float)$ib->total_amount, 2) }}
                         </div>
-                        <div style="font-size: 11.5px; color: var(--emerald-dark); font-weight: 600;">{{ $ib->tx_count }} recorded inflow(s)</div>
+                        <div style="font-size: 11px; color: var(--emerald-dark); font-weight: 600;">{{ $ib->tx_count }} recorded inflow(s)</div>
                     </div>
                 @endforeach
             </div>
@@ -46,10 +46,10 @@
 
 <!-- SMART TRANSACTION FILTER BAR (COLLAPSED BY DEFAULT) -->
 <section class="section-block theme-ivory always-collapsible-card" id="txFilterSectionCard">
-    <div class="section-header collapsible-form-header" onclick="toggleCollapsibleCard('txFilterSectionCard', 'always')">
-        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+    <div class="section-header collapsible-form-header" onclick="toggleCollapsibleCard('txFilterSectionCard', 'always')" style="flex-wrap: nowrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
             <span class="collapsible-chevron-badge mono">▸</span>
-            <h3 class="section-title" style="font-size: 13.5px;">Search, Filter &amp; Record Transactions</h3>
+            <h3 class="section-title" style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Search, Filter &amp; Record Transactions</h3>
         </div>
         <button type="button"
                 class="btn btn-ivory btn-sm collapsible-toggle-btn"
