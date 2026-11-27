@@ -52,22 +52,24 @@ class ReportAndSettingsController extends Controller
         $netBalance = UnifiedFinancialEngine::sub($totalIncome, $totalExpenses);
         $explicitSavings = $this->engine->sumExplicitSavings($user->id, $startDate, $endDate);
 
-        $categorySummary = $transactions->where('type', 'expense')
-            ->groupBy('expense_category_id')
-            ->map(function ($group) use ($totalExpenses) {
-                $cat = $group->first()->category;
-                $sum = '0.00';
-                foreach ($group as $item) {
-                    $sum = UnifiedFinancialEngine::add($sum, (string) $item->amount);
-                }
-                return [
-                    'name' => $cat?->name ?? 'Uncategorised',
-                    'color' => $cat?->color ?? '#319B79',
-                    'count' => $group->count(),
-                    'amount' => $sum,
-                    'share_pct' => (float) $totalExpenses > 0 ? round(((float) $sum / (float) $totalExpenses) * 100, 1) : 0.0,
-                ];
-            })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all();
+        $categorySummary = UnifiedFinancialEngine::assignDistinctCategoryColors(
+            $transactions->where('type', 'expense')
+                ->groupBy('expense_category_id')
+                ->map(function ($group) use ($totalExpenses) {
+                    $cat = $group->first()->category;
+                    $sum = '0.00';
+                    foreach ($group as $item) {
+                        $sum = UnifiedFinancialEngine::add($sum, (string) $item->amount);
+                    }
+                    return [
+                        'name' => $cat?->name ?? 'Uncategorised',
+                        'color' => $cat?->color ?? '#2D9F78',
+                        'count' => $group->count(),
+                        'amount' => $sum,
+                        'share_pct' => (float) $totalExpenses > 0 ? round(((float) $sum / (float) $totalExpenses) * 100, 1) : 0.0,
+                    ];
+                })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all()
+        );
 
         $monthlyOverview = $this->engine->getMonthlyOverview($user, $year, $month);
         $yearlyOverview = $this->engine->getYearlyOverview($user, $year);

@@ -101,6 +101,7 @@ class PeriodTrackingController extends Controller
 
         // Automatically consolidate any duplicate categories with the same normalized name & type
         $this->consolidateDuplicateCategories($user->id);
+        UnifiedFinancialEngine::ensureDistinctUserCategoryColors($user->id);
 
         $categories = ExpenseCategory::with(['subcategories', 'transactions'])
             ->where('user_id', $user->id)

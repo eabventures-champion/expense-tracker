@@ -131,13 +131,23 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Accent Color</label>
-                        <select name="color" class="form-control mono" data-color-picker="true">
+                        <select name="color" id="create_cat_color" class="form-control mono" data-color-picker="true">
                             <option value="#2D9F78">Emerald Green (#2D9F78)</option>
                             <option value="#E66D55">Coral (#E66D55)</option>
                             <option value="#E5A93C">Mustard Yellow (#E5A93C)</option>
-                            <option value="#4E73DF">Blue (#4E73DF)</option>
-                            <option value="#D96D9B">Rose (#D96D9B)</option>
+                            <option value="#4E73DF">Royal Blue (#4E73DF)</option>
+                            <option value="#D96D9B">Rose Pink (#D96D9B)</option>
+                            <option value="#646A7A">Slate Grey (#646A7A)</option>
                             <option value="#1E1B2E">Deep Plum (#1E1B2E)</option>
+                            <option value="#0EA5E9">Sky Cyan (#0EA5E9)</option>
+                            <option value="#8B5CF6">Vivid Violet (#8B5CF6)</option>
+                            <option value="#F97316">Tangerine Orange (#F97316)</option>
+                            <option value="#14B8A6">Teal (#14B8A6)</option>
+                            <option value="#EC4899">Magenta (#EC4899)</option>
+                            <option value="#6366F1">Indigo (#6366F1)</option>
+                            <option value="#84CC16">Lime Green (#84CC16)</option>
+                            <option value="#A855F7">Purple (#A855F7)</option>
+                            <option value="#F43F5E">Crimson Rose (#F43F5E)</option>
                         </select>
                     </div>
                 </div>
@@ -221,9 +231,19 @@
                             <option value="#2D9F78">Emerald Green (#2D9F78)</option>
                             <option value="#E66D55">Coral (#E66D55)</option>
                             <option value="#E5A93C">Mustard Yellow (#E5A93C)</option>
-                            <option value="#4E73DF">Blue (#4E73DF)</option>
-                            <option value="#D96D9B">Rose (#D96D9B)</option>
+                            <option value="#4E73DF">Royal Blue (#4E73DF)</option>
+                            <option value="#D96D9B">Rose Pink (#D96D9B)</option>
+                            <option value="#646A7A">Slate Grey (#646A7A)</option>
                             <option value="#1E1B2E">Deep Plum (#1E1B2E)</option>
+                            <option value="#0EA5E9">Sky Cyan (#0EA5E9)</option>
+                            <option value="#8B5CF6">Vivid Violet (#8B5CF6)</option>
+                            <option value="#F97316">Tangerine Orange (#F97316)</option>
+                            <option value="#14B8A6">Teal (#14B8A6)</option>
+                            <option value="#EC4899">Magenta (#EC4899)</option>
+                            <option value="#6366F1">Indigo (#6366F1)</option>
+                            <option value="#84CC16">Lime Green (#84CC16)</option>
+                            <option value="#A855F7">Purple (#A855F7)</option>
+                            <option value="#F43F5E">Crimson Rose (#F43F5E)</option>
                         </select>
                     </div>
                 </div>
@@ -278,7 +298,7 @@
 
 @push('scripts')
 <script>
-    const existingCategoriesCatalog = @json($categories->map(fn($c) => ['id' => $c->id, 'name' => $c->name, 'type' => $c->type])->values());
+    const existingCategoriesCatalog = @json($categories->map(fn($c) => ['id' => $c->id, 'name' => $c->name, 'type' => $c->type, 'color' => strtoupper((string)$c->color)])->values());
     let activeEditCategoryId = null;
 
     function normalizeCategoryName(str) {
@@ -319,6 +339,16 @@
     }
 
     function openCategoryModal() {
+        const createColorSelect = document.getElementById('create_cat_color');
+        if (createColorSelect) {
+            const usedColors = new Set(existingCategoriesCatalog.map(c => (c.color || '').toUpperCase()));
+            const options = Array.from(createColorSelect.options).map(o => o.value.toUpperCase());
+            const nextUnused = options.find(hex => !usedColors.has(hex)) || options[existingCategoriesCatalog.length % options.length];
+            if (nextUnused) {
+                createColorSelect.value = nextUnused;
+                createColorSelect.dispatchEvent(new CustomEvent('color-picker:refresh'));
+            }
+        }
         document.getElementById('createCategoryModal').classList.add('open');
         checkDuplicateCategoryName('create');
         setTimeout(() => document.getElementById('cat_modal_name')?.focus(), 50);

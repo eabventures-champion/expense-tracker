@@ -439,28 +439,30 @@
                         </button>
                     </div>
                 </div>
-                <div class="category-chart-split-grid" style="display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 14px; align-items: center;">
+                <div class="category-chart-split-grid" style="display: grid; grid-template-columns: 165px minmax(0, 1fr); gap: 12px; align-items: center;">
                     <div class="dashboard-chart-box" style="position: relative; width: 100%; height: 210px; min-height: 210px; cursor: pointer;" onclick="openChartPresentationModal('category')" title="Click to expand in fullscreen presentation mode">
                         <canvas id="categoryDistributionChart" style="display: block; width: 100%; height: 100%;"></canvas>
                     </div>
-                    <div style="max-height: 230px; overflow-y: auto; min-width: 0;">
-                        <table class="data-table" style="font-size: 12px;">
+                    <div style="max-height: 230px; overflow-y: auto; overflow-x: hidden; min-width: 0;">
+                        <table class="data-table" style="font-size: 12px; width: 100%;">
                             <thead>
                                 <tr>
-                                    <th>Category</th>
-                                    <th style="text-align: right;">Amount</th>
-                                    <th style="text-align: right;">Share</th>
+                                    <th style="padding: 8px 8px;">Category</th>
+                                    <th style="text-align: right; padding: 8px 6px;">Amount</th>
+                                    <th style="text-align: right; padding: 8px 8px;">Share</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($monthlyOverview['categories'] as $catItem)
                                     <tr>
-                                        <td>
-                                            <span class="cat-swatch" style="background-color: {{ $catItem['color'] }}; margin-right: 6px;"></span>
-                                            {{ $catItem['name'] }}
+                                        <td style="padding: 8px 8px;">
+                                            <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+                                                <span class="cat-swatch" style="background-color: {{ $catItem['color'] }}; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(20, 22, 31, 0.06);"></span>
+                                                <span style="font-weight: 600; color: var(--text-dark); line-height: 1.25; word-break: break-word;">{{ $catItem['name'] }}</span>
+                                            </div>
                                         </td>
-                                        <td class="mono" style="text-align: right; white-space: nowrap;">{{ $user->currency }}{{ number_format((float)$catItem['amount'], 2) }}</td>
-                                        <td class="mono" style="text-align: right; font-weight: 600; color: var(--text-muted); white-space: nowrap;">{{ $catItem['share_pct'] }}%</td>
+                                        <td class="mono" style="text-align: right; white-space: nowrap; padding: 8px 6px; font-weight: 600;">{{ $user->currency }}{{ number_format((float)$catItem['amount'], 2) }}</td>
+                                        <td class="mono" style="text-align: right; font-weight: 700; color: {{ $catItem['color'] }}; white-space: nowrap; padding: 8px 8px;">{{ $catItem['share_pct'] }}%</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -1329,11 +1331,12 @@
         if (!ctx) return;
         if (presCategoryChartInstance) presCategoryChartInstance.destroy();
 
+        const defaultCategoryPalette = ['#2D9F78', '#E66D55', '#E5A93C', '#4E73DF', '#D96D9B', '#646A7A', '#1E1B2E', '#0EA5E9', '#8B5CF6', '#F97316', '#14B8A6', '#EC4899', '#6366F1', '#84CC16', '#A855F7', '#F43F5E'];
         const hasCategoryData = Array.isArray(categoryData) && categoryData.length > 0;
         const chartLabels = hasCategoryData ? categoryData.map(c => c.name) : ['No Spending Recorded Yet'];
         const chartValues = hasCategoryData ? categoryData.map(c => parseFloat(c.amount) || 0) : [1];
         const chartColors = hasCategoryData
-            ? ['#2D9F78', '#E66D55', '#E5A93C', '#4E73DF', '#D96D9B', '#646A7A', '#1E1B2E', '#238261', '#C88F28']
+            ? categoryData.map((c, idx) => c.color || defaultCategoryPalette[idx % defaultCategoryPalette.length])
             : ['#E5E7EF'];
 
         presCategoryChartInstance = new Chart(ctx, {
@@ -1444,6 +1447,7 @@
 
         const catCtx = document.getElementById('categoryDistributionChart');
         if (catCtx) {
+            const defaultCategoryPalette = ['#2D9F78', '#E66D55', '#E5A93C', '#4E73DF', '#D96D9B', '#646A7A', '#1E1B2E', '#0EA5E9', '#8B5CF6', '#F97316', '#14B8A6', '#EC4899', '#6366F1', '#84CC16', '#A855F7', '#F43F5E'];
             const hasCat = Array.isArray(categoryData) && categoryData.length > 0;
             new Chart(catCtx, {
                 type: 'doughnut',
@@ -1451,7 +1455,7 @@
                     labels: hasCat ? categoryData.map(c => c.name) : ['No Spending Recorded Yet'],
                     datasets: [{
                         data: hasCat ? categoryData.map(c => parseFloat(c.amount) || 0) : [1],
-                        backgroundColor: hasCat ? ['#2D9F78', '#E66D55', '#E5A93C', '#4E73DF', '#D96D9B', '#646A7A', '#1E1B2E'] : ['#E5E7EF'],
+                        backgroundColor: hasCat ? categoryData.map((c, idx) => c.color || defaultCategoryPalette[idx % defaultCategoryPalette.length]) : ['#E5E7EF'],
                         borderColor: '#FFFFFF',
                         borderWidth: 2
                     }]

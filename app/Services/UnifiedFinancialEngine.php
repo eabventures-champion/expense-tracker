@@ -13,6 +13,141 @@ use Illuminate\Support\Collection;
 class UnifiedFinancialEngine
 {
     /**
+     * Distinct category color palette used across doughnut charts, tables, and badges
+     * so every category is clearly demarcated and 100% synchronized between charts and tables.
+     */
+    public const CATEGORY_PALETTE = [
+        '#2D9F78', // Emerald Green
+        '#E66D55', // Coral
+        '#E5A93C', // Mustard Yellow
+        '#4E73DF', // Royal Blue
+        '#D96D9B', // Rose Pink
+        '#646A7A', // Slate Grey
+        '#1E1B2E', // Deep Plum
+        '#0EA5E9', // Sky Cyan
+        '#8B5CF6', // Vivid Violet
+        '#F97316', // Tangerine Orange
+        '#14B8A6', // Teal
+        '#EC4899', // Magenta
+        '#6366F1', // Indigo
+        '#84CC16', // Lime Green
+        '#A855F7', // Purple
+        '#F43F5E', // Crimson Rose
+    ];
+
+    /**
+     * Ensure every item in a ranked category breakdown has a distinct color from the palette
+     * (preserving custom colors when unique, and automatically assigning the next distinct
+     * palette color whenever multiple categories share the default green).
+     */
+    public static function assignDistinctCategoryColors(array $categories): array
+    {
+        $usedColors = [];
+        $palette = self::CATEGORY_PALETTE;
+        $paletteCount = count($palette);
+
+        foreach ($categories as $idx => &$catItem) {
+            $rawColor = strtoupper(trim((string) ($catItem['color'] ?? '')));
+            if ($rawColor !== '' && !in_array($rawColor, $usedColors, true)) {
+                $usedColors[] = $rawColor;
+                continue;
+            }
+
+            // Pick the first palette color not yet used in this list
+            $assigned = null;
+            for ($i = 0; $i < $paletteCount; $i++) {
+                $candidate = strtoupper($palette[($idx + $i) % $paletteCount]);
+                if (!in_array($candidate, $usedColors, true)) {
+                    $assigned = $palette[($idx + $i) % $paletteCount];
+                    break;
+                }
+            }
+
+            if ($assigned === null) {
+                $assigned = $palette[$idx % $paletteCount];
+            }
+
+            $catItem['color'] = $assigned;
+            $usedColors[] = strtoupper($assigned);
+        }
+        unset($catItem);
+
+        return $categories;
+    }
+
+    /**
+     * Automatically diversify a user's stored category colors if multiple categories
+     * were created with the same default green (#2D9F78 / #319B79), ordering by highest
+     * spend first so top categories match the primary doughnut chart palette (#2D9F78, #E66D55, #E5A93C, #4E73DF...).
+     */
+    public static function ensureDistinctUserCategoryColors(int $userId): void
+    {
+        $categories = ExpenseCategory::withSum('transactions as total_spent', 'amount')
+            ->where('user_id', $userId)
+            ->get()
+            ->sortByDesc(fn (ExpenseCategory $c) => (float) ($c->total_spent ?? 0))
+            ->values();
+
+        if ($categories->count() <= 1) {
+            return;
+        }
+
+        $defaultGreens = ['#2D9F78', '#319B79'];
+        $defaultGreenCount = $categories->filter(
+            fn (ExpenseCategory $c) => in_array(strtoupper(trim((string) $c->color)), $defaultGreens, true)
+        )->count();
+
+        if ($defaultGreenCount <= 1) {
+            return;
+        }
+
+        $palette = self::CATEGORY_PALETTE;
+        $paletteCount = count($palette);
+        $usedColors = [];
+
+        // First record any non-default colors already chosen
+        foreach ($categories as $cat) {
+            $norm = strtoupper(trim((string) $cat->color));
+            if ($norm !== '' && !in_array($norm, $defaultGreens, true)) {
+                $usedColors[] = $norm;
+            }
+        }
+
+        $firstDefaultKept = false;
+        foreach ($categories as $idx => $cat) {
+            $norm = strtoupper(trim((string) $cat->color));
+            if (!in_array($norm, $defaultGreens, true)) {
+                continue;
+            }
+
+            if (!$firstDefaultKept && !in_array('#2D9F78', $usedColors, true)) {
+                $firstDefaultKept = true;
+                $usedColors[] = '#2D9F78';
+                if ($norm !== '#2D9F78') {
+                    $cat->update(['color' => '#2D9F78']);
+                }
+                continue;
+            }
+
+            $assigned = null;
+            for ($i = 0; $i < $paletteCount; $i++) {
+                $candidate = $palette[($idx + $i) % $paletteCount];
+                if (!in_array(strtoupper($candidate), $usedColors, true)) {
+                    $assigned = $candidate;
+                    break;
+                }
+            }
+
+            if ($assigned === null) {
+                $assigned = $palette[$idx % $paletteCount];
+            }
+
+            $cat->update(['color' => $assigned]);
+            $usedColors[] = strtoupper($assigned);
+        }
+    }
+
+    /**
      * Exact decimal addition using BCMath (2 decimal places).
      */
     public static function add(string|float|int $a, string|float|int $b): string
@@ -265,6 +400,8 @@ class UnifiedFinancialEngine
      */
     public function getSpendingBreakdownExplorer(User $user, int $year, int $month): array
     {
+        self::ensureDistinctUserCategoryColors($user->id);
+
         $monthStart = Carbon::createFromDate($year, $month, 1)->startOfMonth();
         $monthEnd = $monthStart->copy()->endOfMonth();
 
@@ -407,22 +544,24 @@ class UnifiedFinancialEngine
 
         $prevDayExpense = $this->sumTransactions($user->id, 'expense', $prevDate->toDateString(), $prevDate->toDateString());
 
-        $categoryBreakdown = $expenses->groupBy('expense_category_id')->map(function (Collection $group) use ($totalExpense) {
-            $cat = $group->first()->category;
-            $sum = '0.00';
-            foreach ($group as $item) {
-                $sum = self::add($sum, (string) $item->amount);
-            }
-            return [
-                'category_id' => $cat?->id,
-                'name' => $cat?->name ?? 'Uncategorised',
-                'color' => $cat?->color ?? '#319B79',
-                'icon' => $cat?->icon ?? 'tag',
-                'amount' => $sum,
-                'count' => $group->count(),
-                'share_pct' => (float) $totalExpense > 0 ? round(((float) $sum / (float) $totalExpense) * 100, 1) : 0.0,
-            ];
-        })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all();
+        $categoryBreakdown = self::assignDistinctCategoryColors(
+            $expenses->groupBy('expense_category_id')->map(function (Collection $group) use ($totalExpense) {
+                $cat = $group->first()->category;
+                $sum = '0.00';
+                foreach ($group as $item) {
+                    $sum = self::add($sum, (string) $item->amount);
+                }
+                return [
+                    'category_id' => $cat?->id,
+                    'name' => $cat?->name ?? 'Uncategorised',
+                    'color' => $cat?->color ?? '#2D9F78',
+                    'icon' => $cat?->icon ?? 'tag',
+                    'amount' => $sum,
+                    'count' => $group->count(),
+                    'share_pct' => (float) $totalExpense > 0 ? round(((float) $sum / (float) $totalExpense) * 100, 1) : 0.0,
+                ];
+            })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all()
+        );
 
         // 7-day trailing daily trend ending on selected date
         $trend = [];
@@ -512,20 +651,22 @@ class UnifiedFinancialEngine
 
         $avgDaily = number_format((float) $totalWeekly / 7, 2, '.', '');
 
-        $categoryDistribution = $expenses->groupBy('expense_category_id')->map(function (Collection $group) use ($totalWeekly) {
-            $cat = $group->first()->category;
-            $sum = '0.00';
-            foreach ($group as $item) {
-                $sum = self::add($sum, (string) $item->amount);
-            }
-            return [
-                'name' => $cat?->name ?? 'Uncategorised',
-                'color' => $cat?->color ?? '#319B79',
-                'amount' => $sum,
-                'count' => $group->count(),
-                'share_pct' => (float) $totalWeekly > 0 ? round(((float) $sum / (float) $totalWeekly) * 100, 1) : 0.0,
-            ];
-        })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all();
+        $categoryDistribution = self::assignDistinctCategoryColors(
+            $expenses->groupBy('expense_category_id')->map(function (Collection $group) use ($totalWeekly) {
+                $cat = $group->first()->category;
+                $sum = '0.00';
+                foreach ($group as $item) {
+                    $sum = self::add($sum, (string) $item->amount);
+                }
+                return [
+                    'name' => $cat?->name ?? 'Uncategorised',
+                    'color' => $cat?->color ?? '#2D9F78',
+                    'amount' => $sum,
+                    'count' => $group->count(),
+                    'share_pct' => (float) $totalWeekly > 0 ? round(((float) $sum / (float) $totalWeekly) * 100, 1) : 0.0,
+                ];
+            })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all()
+        );
 
         return [
             'week_start' => $weekStart->toDateString(),
@@ -550,6 +691,8 @@ class UnifiedFinancialEngine
      */
     public function getMonthlyOverview(User $user, int $year, int $month): array
     {
+        self::ensureDistinctUserCategoryColors($user->id);
+
         $monthStart = Carbon::createFromDate($year, $month, 1)->startOfMonth();
         $monthEnd = $monthStart->copy()->endOfMonth();
         $prevMonth = $monthStart->copy()->subMonthNoOverflow();
@@ -615,7 +758,7 @@ class UnifiedFinancialEngine
             return [
                 'category_id' => $cat?->id,
                 'name' => $cat?->name ?? 'Uncategorised',
-                'color' => $cat?->color ?? '#319B79',
+                'color' => $cat?->color ?? '#2D9F78',
                 'icon' => $cat?->icon ?? 'tag',
                 'amount' => $sum,
                 'count' => $group->count(),
@@ -623,6 +766,8 @@ class UnifiedFinancialEngine
                 'subcategories' => $subcategoriesList,
             ];
         })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all();
+
+        $categories = self::assignDistinctCategoryColors($categories);
 
         // Daily spending trend across the month
         $dailyTrend = [];
@@ -741,21 +886,23 @@ class UnifiedFinancialEngine
             ->whereBetween('transaction_date', [$yearStart, $yearEnd])
             ->get();
 
-        $categoryDistribution = $yearExpenses->groupBy('expense_category_id')->map(function (Collection $group) use ($totalAnnualExpense) {
-            $cat = $group->first()->category;
-            $sum = '0.00';
-            foreach ($group as $item) {
-                $sum = self::add($sum, (string) $item->amount);
-            }
-            return [
-                'category_id' => $cat?->id,
-                'name' => $cat?->name ?? 'Uncategorised',
-                'color' => $cat?->color ?? '#319B79',
-                'amount' => $sum,
-                'count' => $group->count(),
-                'share_pct' => (float) $totalAnnualExpense > 0 ? round(((float) $sum / (float) $totalAnnualExpense) * 100, 1) : 0.0,
-            ];
-        })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all();
+        $categoryDistribution = self::assignDistinctCategoryColors(
+            $yearExpenses->groupBy('expense_category_id')->map(function (Collection $group) use ($totalAnnualExpense) {
+                $cat = $group->first()->category;
+                $sum = '0.00';
+                foreach ($group as $item) {
+                    $sum = self::add($sum, (string) $item->amount);
+                }
+                return [
+                    'category_id' => $cat?->id,
+                    'name' => $cat?->name ?? 'Uncategorised',
+                    'color' => $cat?->color ?? '#2D9F78',
+                    'amount' => $sum,
+                    'count' => $group->count(),
+                    'share_pct' => (float) $totalAnnualExpense > 0 ? round(((float) $sum / (float) $totalAnnualExpense) * 100, 1) : 0.0,
+                ];
+            })->sortByDesc(fn ($c) => (float) $c['amount'])->values()->all()
+        );
 
         return [
             'year' => $year,
