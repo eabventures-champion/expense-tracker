@@ -148,6 +148,59 @@ class UnifiedFinancialEngine
     }
 
     /**
+     * One-time reconciliation to switch all existing transactions recorded under "Bank"
+     * to the user's "Momo" payment method (the second configured payment method).
+     */
+    public static function migrateExistingBankTransactionsToMomo(int $userId): void
+    {
+        $markerPath = storage_path('app/bank_to_momo_migrated.json');
+        $migrated = [];
+        if (is_file($markerPath)) {
+            $decoded = json_decode((string) @file_get_contents($markerPath), true);
+            if (is_array($decoded)) {
+                $migrated = $decoded;
+            }
+        }
+
+        if (!empty($migrated[(string) $userId])) {
+            return;
+        }
+
+        $methods = \App\Models\PaymentMethod::where('user_id', $userId)->orderBy('id')->get();
+        if ($methods->isEmpty()) {
+            return;
+        }
+
+        $momoMethod = $methods->first(function (\App\Models\PaymentMethod $pm) {
+            return str_contains(strtolower(trim($pm->name)), 'momo');
+        });
+
+        // If the user has at least 2 payment methods and none literally contains "momo", use the 2nd option
+        if (!$momoMethod && $methods->count() >= 2) {
+            $momoMethod = $methods->values()->get(1);
+        }
+
+        if (!$momoMethod) {
+            return;
+        }
+
+        Transaction::where('user_id', $userId)
+            ->where(function ($q) use ($momoMethod) {
+                $q->whereNull('payment_method_id')
+                  ->orWhere('payment_method_id', '!=', $momoMethod->id);
+            })
+            ->update(['payment_method_id' => $momoMethod->id]);
+
+        $migrated[(string) $userId] = [
+            'payment_method_id' => $momoMethod->id,
+            'payment_method_name' => $momoMethod->name,
+            'migrated_at' => now()->toIso8601String(),
+        ];
+
+        @file_put_contents($markerPath, json_encode($migrated, JSON_PRETTY_PRINT));
+    }
+
+    /**
      * Exact decimal addition using BCMath (2 decimal places).
      */
     public static function add(string|float|int $a, string|float|int $b): string
@@ -401,6 +454,7 @@ class UnifiedFinancialEngine
     public function getSpendingBreakdownExplorer(User $user, int $year, int $month): array
     {
         self::ensureDistinctUserCategoryColors($user->id);
+        self::migrateExistingBankTransactionsToMomo($user->id);
 
         $monthStart = Carbon::createFromDate($year, $month, 1)->startOfMonth();
         $monthEnd = $monthStart->copy()->endOfMonth();

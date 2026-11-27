@@ -39,6 +39,8 @@ class TransactionController extends Controller
     private function renderTransactionList(Request $request, ?string $forcedType, string $pageTitle)
     {
         $user = $this->currentUser();
+        UnifiedFinancialEngine::ensureDistinctUserCategoryColors($user->id);
+        UnifiedFinancialEngine::migrateExistingBankTransactionsToMomo($user->id);
         $type = $forcedType ?? $request->query('type');
         $categoryId = $request->query('category_id');
         $paymentMethodId = $request->query('payment_method_id');

@@ -21,6 +21,7 @@ class ReportAndSettingsController extends Controller
     public function reports(Request $request)
     {
         $user = $this->currentUser();
+        UnifiedFinancialEngine::migrateExistingBankTransactionsToMomo($user->id);
         $now = now();
         $reportType = $request->query('report_type', 'monthly'); // daily, weekly, monthly, annual, category, income_vs_expense, budget
         $startDate = $request->query('start_date', $now->copy()->startOfMonth()->toDateString());
@@ -113,6 +114,7 @@ class ReportAndSettingsController extends Controller
     public function export(Request $request)
     {
         $user = $this->currentUser();
+        UnifiedFinancialEngine::migrateExistingBankTransactionsToMomo($user->id);
         $format = $request->query('format', 'csv'); // csv, excel, pdf
         $startDate = $request->query('start_date', now()->startOfMonth()->toDateString());
         $endDate = $request->query('end_date', now()->endOfMonth()->toDateString());
