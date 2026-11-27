@@ -56,15 +56,25 @@
 </section>
 
 <div class="grid-2">
-    <!-- PERSONAL PROFILE INFORMATION FORM -->
-    <section class="section-block theme-ivory">
-        <div class="section-header">
-            <div>
-                <div style="font-size: 10.5px; color: var(--blue); text-transform: uppercase; font-weight: 700;">Identity & Preferences</div>
-                <h3 class="section-title">Personal Profile Details</h3>
+    <!-- PERSONAL PROFILE INFORMATION FORM (COLLAPSED ON MOBILE BY DEFAULT) -->
+    <section class="section-block theme-ivory mobile-collapsible-card" id="profileDetailsFormCard">
+        <div class="section-header" onclick="toggleCollapsibleCard('profileDetailsFormCard', 'mobile')">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                <span class="collapsible-chevron-badge mono mobile-only-collapse-el">▸</span>
+                <div>
+                    <div style="font-size: 10.5px; color: var(--blue); text-transform: uppercase; font-weight: 700;">Identity &amp; Preferences</div>
+                    <h3 class="section-title">Personal Profile Details</h3>
+                </div>
             </div>
+            <button type="button"
+                    class="btn btn-ivory btn-sm collapsible-toggle-btn mobile-only-collapse-el"
+                    data-expand-label="Edit ▾"
+                    data-hide-label="Hide ▴"
+                    style="padding: 3px 9px; font-size: 10.5px; border-radius: 9999px; font-weight: 700; flex-shrink: 0;">
+                Edit ▾
+            </button>
         </div>
-        <div class="section-body">
+        <div class="section-body collapsible-card-body">
             <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 @method('PUT')

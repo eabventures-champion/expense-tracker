@@ -44,12 +44,22 @@
     </section>
 @endif
 
-<!-- SMART TRANSACTION FILTER BAR -->
-<section class="section-block theme-ivory">
-    <div class="section-header">
-        <h3 class="section-title">Search, Filter & Record Transactions</h3>
+<!-- SMART TRANSACTION FILTER BAR (COLLAPSED BY DEFAULT) -->
+<section class="section-block theme-ivory always-collapsible-card" id="txFilterSectionCard">
+    <div class="section-header collapsible-form-header" onclick="toggleCollapsibleCard('txFilterSectionCard', 'always')">
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+            <span class="collapsible-chevron-badge mono">▸</span>
+            <h3 class="section-title" style="font-size: 13.5px;">Search, Filter &amp; Record Transactions</h3>
+        </div>
+        <button type="button"
+                class="btn btn-ivory btn-sm collapsible-toggle-btn"
+                data-expand-label="Filter ▾"
+                data-hide-label="Hide ▴"
+                style="padding: 3px 9px; font-size: 10.5px; border-radius: 9999px; font-weight: 700; flex-shrink: 0;">
+            Filter ▾
+        </button>
     </div>
-    <div class="section-body">
+    <div class="section-body collapsible-card-body">
         <form method="GET" action="{{ url()->current() }}" class="form-grid" style="align-items: end;">
             <div class="form-group">
                 <label class="form-label">Search Keyword / Ref</label>

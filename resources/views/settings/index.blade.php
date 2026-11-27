@@ -5,11 +5,21 @@
 
 @section('content')
 <div class="grid-2">
-    <section class="section-block theme-ivory">
-        <div class="section-header">
-            <h2 class="section-title">Owner Profile, Currency & Master Thresholds</h2>
+    <section class="section-block theme-ivory mobile-collapsible-card" id="settingsThresholdsFormCard">
+        <div class="section-header" onclick="toggleCollapsibleCard('settingsThresholdsFormCard', 'mobile')">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                <span class="collapsible-chevron-badge mono mobile-only-collapse-el">▸</span>
+                <h2 class="section-title">Owner Profile, Currency &amp; Master Thresholds</h2>
+            </div>
+            <button type="button"
+                    class="btn btn-ivory btn-sm collapsible-toggle-btn mobile-only-collapse-el"
+                    data-expand-label="Edit ▾"
+                    data-hide-label="Hide ▴"
+                    style="padding: 3px 9px; font-size: 10.5px; border-radius: 9999px; font-weight: 700; flex-shrink: 0;">
+                Edit ▾
+            </button>
         </div>
-        <div class="section-body">
+        <div class="section-body collapsible-card-body">
             <form action="{{ route('settings.update') }}" method="POST" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 @method('PUT')
@@ -108,47 +118,62 @@
             <h2 class="section-title">Configured Payment Methods ({{ $paymentMethods->count() }})</h2>
         </div>
         <div class="section-body">
-            <form action="{{ route('settings.payment-methods.store') }}" method="POST" style="margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--ivory-border);">
-                @csrf
-                <div class="form-grid" style="margin-bottom: 12px;">
-                    <div class="form-group">
-                        <label class="form-label">Method Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g., CalBank Visa Card" required>
+            <div class="mobile-collapsible-card" id="addPaymentMethodFormCard" style="margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--ivory-border);">
+                <div class="section-header mobile-only-collapse-el" onclick="toggleCollapsibleCard('addPaymentMethodFormCard', 'mobile')" style="width: 100%; padding: 8px 12px !important; border: 1px solid var(--ivory-border); border-radius: 10px; background-color: var(--ivory-alt); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="collapsible-chevron-badge mono">▸</span>
+                        <strong style="font-size: 12.5px; color: var(--text-dark);">Add New Payment Method</strong>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Type</label>
-                        <select name="type" class="form-control">
-                            <option value="mobile_money">Mobile Money</option>
-                            <option value="bank">Bank Account</option>
-                            <option value="card">Debit / Credit Card</option>
-                            <option value="cash">Physical Cash</option>
-                            <option value="wallet">Digital Wallet</option>
-                        </select>
-                    </div>
+                    <button type="button"
+                            class="btn btn-ivory btn-sm collapsible-toggle-btn"
+                            data-expand-label="+ Add ▾"
+                            data-hide-label="Hide ▴"
+                            style="padding: 3px 9px; font-size: 10.5px; border-radius: 9999px; font-weight: 700;">
+                        + Add ▾
+                    </button>
                 </div>
-                <div class="form-grid" style="margin-bottom: 12px;">
-                    <div class="form-group">
-                        <label class="form-label">Institution / Provider</label>
-                        <input type="text" name="provider" class="form-control" placeholder="e.g., CalBank Ghana">
+                <form action="{{ route('settings.payment-methods.store') }}" method="POST" class="collapsible-card-body">
+                    @csrf
+                    <div class="form-grid" style="margin-bottom: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Method Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g., CalBank Visa Card" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-control">
+                                <option value="mobile_money">Mobile Money</option>
+                                <option value="bank">Bank Account</option>
+                                <option value="card">Debit / Credit Card</option>
+                                <option value="cash">Physical Cash</option>
+                                <option value="wallet">Digital Wallet</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Account / Masked Ref</label>
-                        <input type="text" name="account_reference" class="form-control mono" placeholder="e.g., 4111 •••• 9012">
+                    <div class="form-grid" style="margin-bottom: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Institution / Provider</label>
+                            <input type="text" name="provider" class="form-control" placeholder="e.g., CalBank Ghana">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Account / Masked Ref</label>
+                            <input type="text" name="account_reference" class="form-control mono" placeholder="e.g., 4111 •••• 9012">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Badge Color</label>
+                            <select name="color" class="form-control mono" data-color-picker="true">
+                                <option value="#E5A93C">Mustard Yellow (#E5A93C)</option>
+                                <option value="#2D9F78">Emerald Green (#2D9F78)</option>
+                                <option value="#4E73DF">Blue (#4E73DF)</option>
+                                <option value="#E66D55">Coral (#E66D55)</option>
+                                <option value="#D96D9B">Rose (#D96D9B)</option>
+                                <option value="#1E1B2E">Deep Plum (#1E1B2E)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Badge Color</label>
-                        <select name="color" class="form-control mono" data-color-picker="true">
-                            <option value="#E5A93C">Mustard Yellow (#E5A93C)</option>
-                            <option value="#2D9F78">Emerald Green (#2D9F78)</option>
-                            <option value="#4E73DF">Blue (#4E73DF)</option>
-                            <option value="#E66D55">Coral (#E66D55)</option>
-                            <option value="#D96D9B">Rose (#D96D9B)</option>
-                            <option value="#1E1B2E">Deep Plum (#1E1B2E)</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-emerald btn-sm">+ Add Payment Method</button>
-            </form>
+                    <button type="submit" class="btn btn-emerald btn-sm">+ Add Payment Method</button>
+                </form>
+            </div>
 
             <div class="table-wrap">
                 <table class="data-table">

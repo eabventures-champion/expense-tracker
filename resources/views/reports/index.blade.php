@@ -4,20 +4,32 @@
 @section('page_title', 'Financial Statements & Multi-Format Exports (PDF, Excel, CSV)')
 
 @section('content')
-<!-- FILTER & EXPORT TOOLBAR -->
-<section class="section-block theme-ivory">
-    <div class="section-header">
-        <h2 class="section-title">Generate Custom Date-Range Financial Report</h2>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <a href="{{ route('reports.export', ['format' => 'csv', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
-               class="btn btn-emerald btn-sm">⬇ Export CSV</a>
-            <a href="{{ route('reports.export', ['format' => 'excel', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
-               class="btn btn-mustard btn-sm">⬇ Export Excel (.xls)</a>
-            <a href="{{ route('reports.export', ['format' => 'pdf', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
-               target="_blank" class="btn btn-coral btn-sm">🖨 Printable PDF Statement ↗</a>
+<!-- FILTER & EXPORT TOOLBAR (COLLAPSED ON MOBILE BY DEFAULT) -->
+<section class="section-block theme-ivory mobile-collapsible-card" id="reportsFilterFormCard">
+    <div class="section-header" onclick="toggleCollapsibleCard('reportsFilterFormCard', 'mobile')">
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+            <span class="collapsible-chevron-badge mono mobile-only-collapse-el">▸</span>
+            <h2 class="section-title">Generate Custom Date-Range Financial Report</h2>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button type="button"
+                    class="btn btn-ivory btn-sm collapsible-toggle-btn mobile-only-collapse-el"
+                    data-expand-label="Configure ▾"
+                    data-hide-label="Hide ▴"
+                    style="padding: 3px 9px; font-size: 10.5px; border-radius: 9999px; font-weight: 700; flex-shrink: 0;">
+                Configure ▾
+            </button>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;" onclick="event.stopPropagation()">
+                <a href="{{ route('reports.export', ['format' => 'csv', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
+                   class="btn btn-emerald btn-sm">⬇ Export CSV</a>
+                <a href="{{ route('reports.export', ['format' => 'excel', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
+                   class="btn btn-mustard btn-sm">⬇ Export Excel (.xls)</a>
+                <a href="{{ route('reports.export', ['format' => 'pdf', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
+                   target="_blank" class="btn btn-coral btn-sm">🖨 Printable PDF Statement ↗</a>
+            </div>
         </div>
     </div>
-    <div class="section-body">
+    <div class="section-body collapsible-card-body">
         <form method="GET" action="{{ route('reports.index') }}" class="form-grid" style="align-items: end;">
             <div class="form-group">
                 <label class="form-label">Report Template</label>

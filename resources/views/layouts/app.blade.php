@@ -1493,7 +1493,73 @@
             display: none;
         }
 
+        /* COLLAPSIBLE FORM CARDS (ALWAYS OR MOBILE-ONLY) */
+        .collapsible-form-header {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible-chevron-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background-color: var(--ivory);
+            border: 1px solid var(--ivory-border);
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--plum);
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .always-collapsible-card:not(.is-expanded) > .collapsible-card-body {
+            display: none !important;
+        }
+
+        .always-collapsible-card:not(.is-expanded) > .section-header {
+            border-bottom: none;
+        }
+
+        .always-collapsible-card.is-expanded .collapsible-chevron-badge {
+            background-color: var(--emerald-soft);
+            color: var(--emerald-dark);
+        }
+
+        .mobile-only-collapse-el {
+            display: none !important;
+        }
+
         @media (max-width: 720px) {
+            .mobile-only-collapse-el {
+                display: inline-flex !important;
+            }
+
+            .mobile-collapsible-card > .section-header {
+                cursor: pointer;
+                user-select: none;
+                padding: 11px 14px !important;
+            }
+
+            .mobile-collapsible-card:not(.mobile-expanded) > .collapsible-card-body {
+                display: none !important;
+            }
+
+            .mobile-collapsible-card:not(.mobile-expanded) > .section-header {
+                border-bottom: none;
+            }
+
+            .mobile-collapsible-card.mobile-expanded .collapsible-chevron-badge {
+                background-color: var(--emerald-soft);
+                color: var(--emerald-dark);
+            }
+
+            .always-collapsible-card > .section-header {
+                padding: 11px 14px !important;
+            }
+
             .horizon-bar-card {
                 padding: 10px 14px !important;
             }
@@ -3315,6 +3381,29 @@
 
     function closeMobileSidebar() {
         document.getElementById('appShell')?.classList.remove('mobile-nav-open');
+    }
+
+    function toggleCollapsibleCard(cardId, mode = 'mobile') {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+
+        if (mode === 'mobile' && window.innerWidth > 720) {
+            return;
+        }
+
+        const className = mode === 'always' ? 'is-expanded' : 'mobile-expanded';
+        const isExpanded = card.classList.toggle(className);
+        const chevron = card.querySelector('.collapsible-chevron-badge');
+        const btn = card.querySelector('.collapsible-toggle-btn');
+
+        if (chevron) {
+            chevron.textContent = isExpanded ? '▾' : '▸';
+        }
+        if (btn) {
+            const expandLabel = btn.getAttribute('data-expand-label') || 'Expand ▾';
+            const hideLabel = btn.getAttribute('data-hide-label') || 'Hide ▴';
+            btn.textContent = isExpanded ? hideLabel : expandLabel;
+        }
     }
 
     (function restoreSidebarState() {
