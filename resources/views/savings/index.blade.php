@@ -396,7 +396,7 @@
                         </div>
                     </div>
 
-                    <div class="table-wrap" style="border: 1px solid var(--ivory-border); border-radius: 12px; overflow: hidden;">
+                    <div class="table-wrap" style="border: 1px solid var(--ivory-border); border-radius: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
                         <table class="data-table">
                             <thead>
                                 <tr>

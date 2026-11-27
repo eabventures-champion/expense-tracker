@@ -919,7 +919,7 @@
                         </div>
                     </div>
 
-                    <div class="table-wrap kpi-modal-table-wrap" style="border: 1px solid var(--ivory-border); border-radius: 12px; max-height: 410px; overflow-y: auto; overflow-x: hidden;">
+                    <div class="table-wrap kpi-modal-table-wrap" style="border: 1px solid var(--ivory-border); border-radius: 12px; max-height: 410px; overflow-y: auto; overflow-x: auto; -webkit-overflow-scrolling: touch;">
                         @php
                             $compoundedKpiItems = $pData['items']->groupBy(function ($itemTx) {
                                 return $itemTx->type . '_title|' . ($itemTx->expense_category_id ?: 0) . '|' . preg_replace('/\s+/', ' ', strtolower(trim((string) $itemTx->title)));
