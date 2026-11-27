@@ -149,11 +149,11 @@ class UnifiedFinancialEngine
 
     /**
      * One-time reconciliation to switch all existing transactions recorded under "Bank"
-     * to the user's "Momo" payment method (the second configured payment method).
+     * to the user's "Momo" payment method (creating "Momo" if not yet present on the workspace).
      */
     public static function migrateExistingBankTransactionsToMomo(int $userId): void
     {
-        $markerPath = storage_path('app/bank_to_momo_migrated.json');
+        $markerPath = storage_path('app/bank_to_momo_migrated_v2.json');
         $migrated = [];
         if (is_file($markerPath)) {
             $decoded = json_decode((string) @file_get_contents($markerPath), true);
@@ -162,33 +162,38 @@ class UnifiedFinancialEngine
             }
         }
 
-        if (!empty($migrated[(string) $userId])) {
-            return;
-        }
-
         $methods = \App\Models\PaymentMethod::where('user_id', $userId)->orderBy('id')->get();
-        if ($methods->isEmpty()) {
-            return;
-        }
 
         $momoMethod = $methods->first(function (\App\Models\PaymentMethod $pm) {
             return str_contains(strtolower(trim($pm->name)), 'momo');
         });
 
-        // If the user has at least 2 payment methods and none literally contains "momo", use the 2nd option
-        if (!$momoMethod && $methods->count() >= 2) {
-            $momoMethod = $methods->values()->get(1);
+        // If "Momo" does not exist yet on this workspace (e.g., localhost only had "Bank"), create it automatically
+        if (!$momoMethod) {
+            $momoMethod = \App\Models\PaymentMethod::create([
+                'user_id' => $userId,
+                'name' => 'Momo',
+                'type' => 'mobile_money',
+                'provider' => 'Mobile network',
+                'account_reference' => null,
+                'color' => '#2D9F78',
+                'is_default' => true,
+            ]);
         }
 
-        if (!$momoMethod) {
+        if (!empty($migrated[(string) $userId])) {
             return;
         }
 
         Transaction::where('user_id', $userId)
-            ->where(function ($q) use ($momoMethod) {
-                $q->whereNull('payment_method_id')
-                  ->orWhere('payment_method_id', '!=', $momoMethod->id);
-            })
+            ->update(['payment_method_id' => $momoMethod->id]);
+
+        \App\Models\SavingsRecord::where('user_id', $userId)
+            ->whereNotNull('payment_method_id')
+            ->update(['payment_method_id' => $momoMethod->id]);
+
+        \App\Models\RecurringTransaction::where('user_id', $userId)
+            ->whereNotNull('payment_method_id')
             ->update(['payment_method_id' => $momoMethod->id]);
 
         $migrated[(string) $userId] = [
