@@ -1569,6 +1569,8 @@
                 cursor: pointer;
                 user-select: none;
                 padding: 11px 14px !important;
+                flex-wrap: nowrap;
+                gap: 8px;
             }
 
             .mobile-collapsible-card:not(.mobile-expanded) > .collapsible-card-body {
@@ -2120,6 +2122,27 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+
+            /* SETTINGS OWNER PROFILE & THRESHOLDS CARD MOBILE ORGANIZATION */
+            .settings-thresholds-title {
+                font-size: 12.5px !important;
+                line-height: 1.3 !important;
+            }
+
+            .settings-mobile-grid-2 {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 10px !important;
+            }
+
+            .settings-mobile-span-2 {
+                grid-column: span 2 !important;
+            }
+
+            .settings-save-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
 

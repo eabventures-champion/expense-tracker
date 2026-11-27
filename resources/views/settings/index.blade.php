@@ -6,10 +6,10 @@
 @section('content')
 <div class="grid-2">
     <section class="section-block theme-ivory mobile-collapsible-card" id="settingsThresholdsFormCard">
-        <div class="section-header" onclick="toggleCollapsibleCard('settingsThresholdsFormCard', 'mobile')">
-            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+        <div class="section-header settings-thresholds-header" onclick="toggleCollapsibleCard('settingsThresholdsFormCard', 'mobile')" style="flex-wrap: nowrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
                 <span class="collapsible-chevron-badge mono mobile-only-collapse-el">▸</span>
-                <h2 class="section-title">Owner Profile, Currency &amp; Master Thresholds</h2>
+                <h2 class="section-title settings-thresholds-title" style="min-width: 0;">Owner Profile, Currency &amp; Master Thresholds</h2>
             </div>
             <button type="button"
                     class="btn btn-ivory btn-sm collapsible-toggle-btn mobile-only-collapse-el"
@@ -20,10 +20,10 @@
             </button>
         </div>
         <div class="section-body collapsible-card-body">
-            <form action="{{ route('settings.update') }}" method="POST" style="display: flex; flex-direction: column; gap: 14px;">
+            <form action="{{ route('settings.update') }}" method="POST" class="settings-thresholds-form" style="display: flex; flex-direction: column; gap: 12px;">
                 @csrf
                 @method('PUT')
-                <div class="form-grid">
+                <div class="form-grid settings-mobile-grid-2">
                     <div class="form-group">
                         <label class="form-label">Full Name</label>
                         <input type="text" name="name" value="{{ $user->name }}" class="form-control" required>
@@ -33,7 +33,7 @@
                         <input type="email" name="email" value="{{ $user->email }}" class="form-control" required>
                     </div>
                 </div>
-                <div class="form-grid">
+                <div class="form-grid settings-mobile-grid-2">
                     <div class="form-group">
                         <label class="form-label">Active Default Currency</label>
                         <select name="currency" class="form-control mono">
@@ -49,7 +49,7 @@
                         <input type="number" step="0.01" name="monthly_income_target" value="{{ $user->monthly_income_target }}" class="form-control mono" required>
                     </div>
                 </div>
-                <div class="form-grid">
+                <div class="form-grid settings-mobile-grid-2">
                     <div class="form-group">
                         <label class="form-label">Overall Monthly Budget</label>
                         <input type="number" step="0.01" name="overall_monthly_budget" value="{{ $user->overall_monthly_budget }}" class="form-control mono" required>
@@ -58,13 +58,13 @@
                         <label class="form-label">Weekly Spending Limit</label>
                         <input type="number" step="0.01" name="weekly_spending_limit" value="{{ $user->weekly_spending_limit }}" class="form-control mono" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group settings-mobile-span-2">
                         <label class="form-label">Yearly Spending Target</label>
                         <input type="number" step="0.01" name="yearly_spending_target" value="{{ $user->yearly_spending_target }}" class="form-control mono" required>
                     </div>
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-plum">Save Platform Settings</button>
+                    <button type="submit" class="btn btn-plum settings-save-btn">Save Platform Settings</button>
                 </div>
             </form>
 
