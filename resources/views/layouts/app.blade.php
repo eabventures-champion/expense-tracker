@@ -2028,6 +2028,54 @@
                 font-size: 11px !important;
                 white-space: nowrap;
             }
+
+            /* REPORTS & EXPORTS CARD MOBILE ORGANIZATION */
+            .reports-card-header {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+
+            .reports-header-top-row {
+                width: 100%;
+                flex-wrap: nowrap !important;
+            }
+
+            .reports-card-title {
+                font-size: 12.5px !important;
+                line-height: 1.3 !important;
+            }
+
+            .reports-export-actions {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 7px !important;
+                width: 100%;
+                padding-top: 8px;
+                border-top: 1px solid var(--ivory-border);
+            }
+
+            .reports-export-actions .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 7px 8px !important;
+                font-size: 11px !important;
+                white-space: nowrap;
+            }
+
+            .reports-export-actions .btn:last-child {
+                grid-column: span 2;
+            }
+
+            .reports-filter-form {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+            }
+
+            .reports-filter-form .reports-field-full {
+                grid-column: span 2 !important;
+            }
         }
 
         @media (max-width: 580px) {

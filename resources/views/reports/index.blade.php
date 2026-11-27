@@ -6,12 +6,12 @@
 @section('content')
 <!-- FILTER & EXPORT TOOLBAR (COLLAPSED ON MOBILE BY DEFAULT) -->
 <section class="section-block theme-ivory mobile-collapsible-card" id="reportsFilterFormCard">
-    <div class="section-header" onclick="toggleCollapsibleCard('reportsFilterFormCard', 'mobile')">
-        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-            <span class="collapsible-chevron-badge mono mobile-only-collapse-el">▸</span>
-            <h2 class="section-title">Generate Custom Date-Range Financial Report</h2>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+    <div class="section-header reports-card-header" onclick="toggleCollapsibleCard('reportsFilterFormCard', 'mobile')">
+        <div class="reports-header-top-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                <span class="collapsible-chevron-badge mono mobile-only-collapse-el">▸</span>
+                <h2 class="section-title reports-card-title" style="min-width: 0;">Generate Custom Date-Range Financial Report</h2>
+            </div>
             <button type="button"
                     class="btn btn-ivory btn-sm collapsible-toggle-btn mobile-only-collapse-el"
                     data-expand-label="Configure ▾"
@@ -19,19 +19,19 @@
                     style="padding: 3px 9px; font-size: 10.5px; border-radius: 9999px; font-weight: 700; flex-shrink: 0;">
                 Configure ▾
             </button>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;" onclick="event.stopPropagation()">
-                <a href="{{ route('reports.export', ['format' => 'csv', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
-                   class="btn btn-emerald btn-sm">⬇ Export CSV</a>
-                <a href="{{ route('reports.export', ['format' => 'excel', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
-                   class="btn btn-mustard btn-sm">⬇ Export Excel (.xls)</a>
-                <a href="{{ route('reports.export', ['format' => 'pdf', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
-                   target="_blank" class="btn btn-coral btn-sm">🖨 Printable PDF Statement ↗</a>
-            </div>
+        </div>
+        <div class="reports-export-actions" style="display: flex; gap: 8px; flex-wrap: wrap;" onclick="event.stopPropagation()">
+            <a href="{{ route('reports.export', ['format' => 'csv', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
+               class="btn btn-emerald btn-sm">⬇ Export CSV</a>
+            <a href="{{ route('reports.export', ['format' => 'excel', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
+               class="btn btn-mustard btn-sm">⬇ Export Excel (.xls)</a>
+            <a href="{{ route('reports.export', ['format' => 'pdf', 'start_date' => $startDate, 'end_date' => $endDate, 'category_id' => $categoryId]) }}"
+               target="_blank" class="btn btn-coral btn-sm">🖨 Printable PDF Statement ↗</a>
         </div>
     </div>
     <div class="section-body collapsible-card-body">
-        <form method="GET" action="{{ route('reports.index') }}" class="form-grid" style="align-items: end;">
-            <div class="form-group">
+        <form method="GET" action="{{ route('reports.index') }}" class="form-grid reports-filter-form" style="align-items: end;">
+            <div class="form-group reports-field-full">
                 <label class="form-label">Report Template</label>
                 <select name="report_type" class="form-control">
                     <option value="monthly" {{ $reportType === 'monthly' ? 'selected' : '' }}>Monthly Financial Report</option>
@@ -51,7 +51,7 @@
                 <label class="form-label">End Date</label>
                 <input type="date" name="end_date" value="{{ $endDate }}" class="form-control mono">
             </div>
-            <div class="form-group">
+            <div class="form-group reports-field-full">
                 <label class="form-label">Category Filter</label>
                 <select name="category_id" class="form-control">
                     <option value="">All Categories</option>
@@ -60,8 +60,8 @@
                     @endforeach
                 </select>
             </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-plum">Generate Report</button>
+            <div class="form-group reports-field-full">
+                <button type="submit" class="btn btn-plum" style="width: 100%; justify-content: center;">Generate Report</button>
             </div>
         </form>
     </div>
