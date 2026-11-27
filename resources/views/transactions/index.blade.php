@@ -5,7 +5,7 @@
 
 @section('content')
 <!-- SUMMARY STRIP FOR FILTERED LEDGER -->
-<div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+<div class="kpi-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
     <div class="kpi-cell bg-coral">
         <div class="kpi-label">Filtered Expenses Outflow</div>
         <div class="kpi-amount">{{ $user->currency }}{{ number_format((float)$filteredExpenseTotal, 2) }}</div>
