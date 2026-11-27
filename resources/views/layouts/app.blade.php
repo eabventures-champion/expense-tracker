@@ -2076,6 +2076,51 @@
             .reports-filter-form .reports-field-full {
                 grid-column: span 2 !important;
             }
+
+            /* PROFILE SUMMARY BANNER MOBILE ORGANIZATION */
+            .profile-banner-body {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 14px !important;
+            }
+
+            .profile-banner-identity {
+                align-items: center !important;
+                gap: 13px !important;
+            }
+
+            .profile-banner-avatar {
+                width: 54px !important;
+                height: 54px !important;
+                font-size: 20px !important;
+            }
+
+            .profile-banner-name {
+                font-size: 16.5px !important;
+            }
+
+            .profile-banner-meta {
+                font-size: 11.5px !important;
+            }
+
+            .profile-banner-actions {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px !important;
+                width: 100%;
+                padding-top: 12px;
+                border-top: 1px solid var(--ivory-border);
+            }
+
+            .profile-banner-actions .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 8px 8px !important;
+                font-size: 11px !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
         }
 
         @media (max-width: 580px) {

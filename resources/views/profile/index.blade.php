@@ -6,45 +6,45 @@
 @section('content')
 <!-- PROFILE SUMMARY BANNER -->
 <section class="section-block theme-ivory">
-    <div class="section-body" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-        <div style="display: flex; align-items: center; gap: 18px;">
+    <div class="section-body profile-banner-body" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        <div class="profile-banner-identity" style="display: flex; align-items: center; gap: 16px; min-width: 0; flex: 1;">
             @if($user->avatar_path)
-                <img src="{{ asset('storage/' . $user->avatar_path) }}" alt="{{ $user->name }}" style="width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 2px solid var(--emerald);">
+                <img src="{{ asset('storage/' . $user->avatar_path) }}" alt="{{ $user->name }}" class="profile-banner-avatar" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--emerald); flex-shrink: 0;">
             @else
-                <div style="width: 68px; height: 68px; border-radius: 50%; background-color: var(--plum); color: var(--mustard); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; border: 2px solid var(--ivory-border);">
+                <div class="profile-banner-avatar" style="width: 64px; height: 64px; border-radius: 50%; background-color: var(--plum); color: var(--mustard); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; border: 2px solid var(--ivory-border); flex-shrink: 0;">
                     {{ strtoupper(substr($user->name, 0, 1)) }}
                 </div>
             @endif
-            <div>
-                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <h2 style="font-size: 20px; font-weight: 800; color: var(--text-dark);">{{ $user->name }}</h2>
-                    <span class="mono" style="font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background-color: var(--ivory); color: var(--plum); text-transform: uppercase;">
-                        {{ $user->role ?: 'Owner' }}
-                    </span>
-                    @if($user->two_factor_enabled)
-                        <span class="mono" style="font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background-color: var(--emerald-soft); color: var(--emerald-dark);">
-                            ✓ 2FA Protected
-                        </span>
-                    @else
-                        <span class="mono" style="font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background-color: var(--coral-soft); color: var(--coral-dark);">
-                            2FA Disabled
-                        </span>
-                    @endif
-                </div>
-                <div style="font-size: 13px; color: var(--text-muted); margin-top: 3px;">
+            <div style="min-width: 0; flex: 1;">
+                <h2 class="profile-banner-name" style="font-size: 19px; font-weight: 800; color: var(--text-dark); line-height: 1.25;">{{ $user->name }}</h2>
+                <div class="profile-banner-meta" style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px; word-break: break-word;">
                     {{ $user->email }}
                     @if($user->job_title) • {{ $user->job_title }} @endif
                     @if($user->location) • {{ $user->location }} @endif
                 </div>
+                <div class="profile-banner-badges" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 7px;">
+                    <span class="mono" style="font-size: 10px; font-weight: 700; padding: 2.5px 9px; border-radius: 9999px; background-color: var(--ivory); border: 1px solid var(--ivory-border); color: var(--plum); text-transform: uppercase;">
+                        {{ $user->role ?: 'Owner' }}
+                    </span>
+                    @if($user->two_factor_enabled)
+                        <span class="mono" style="font-size: 10px; font-weight: 700; padding: 2.5px 9px; border-radius: 9999px; background-color: var(--emerald-soft); color: var(--emerald-dark);">
+                            ✓ 2FA Protected
+                        </span>
+                    @else
+                        <span class="mono" style="font-size: 10px; font-weight: 700; padding: 2.5px 9px; border-radius: 9999px; background-color: var(--coral-soft); color: var(--coral-dark);">
+                            2FA Disabled
+                        </span>
+                    @endif
+                </div>
                 @if($user->bio)
-                    <div style="font-size: 12.5px; color: var(--text-dark); margin-top: 6px; max-width: 680px;">{{ $user->bio }}</div>
+                    <div style="font-size: 12px; color: var(--text-dark); margin-top: 6px; max-width: 680px;">{{ $user->bio }}</div>
                 @endif
             </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div class="profile-banner-actions" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <button type="button" class="btn btn-plum btn-sm" onclick="openGuidedTourModal(0)">✦ Launch Guided Tour</button>
-            <button type="button" class="btn btn-mustard btn-sm" onclick="openResetWorkspaceModal()">↻ Reset Ledger & Start Fresh</button>
+            <button type="button" class="btn btn-mustard btn-sm" onclick="openResetWorkspaceModal()">↻ Reset &amp; Start Fresh</button>
             <button type="button" class="btn btn-ivory btn-sm" onclick="openPasswordModal()">Change Password</button>
             @if($user->two_factor_enabled)
                 <button type="button" class="btn btn-coral btn-sm" onclick="openDisable2FAModal()">Disable 2FA</button>
@@ -136,17 +136,17 @@
 
     <!-- TWO-FACTOR AUTHENTICATION (2FA) MANAGEMENT CARD -->
     <section class="section-block theme-ivory">
-        <div class="section-header">
-            <div>
+        <div class="section-header" style="flex-wrap: nowrap; gap: 8px;">
+            <div style="min-width: 0;">
                 <div style="font-size: 10.5px; color: var(--emerald); text-transform: uppercase; font-weight: 700;">Account Protection</div>
                 <h3 class="section-title">Two-Factor Authentication (2FA)</h3>
             </div>
             @if($user->two_factor_enabled)
-                <span class="mono" style="background-color: var(--emerald-soft); color: var(--emerald-dark); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 9999px;">
+                <span class="mono" style="background-color: var(--emerald-soft); color: var(--emerald-dark); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; flex-shrink: 0;">
                     ACTIVE
                 </span>
             @else
-                <span class="mono" style="background-color: var(--ivory); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 9999px;">
+                <span class="mono" style="background-color: var(--ivory); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; flex-shrink: 0;">
                     INACTIVE
                 </span>
             @endif
