@@ -182,8 +182,7 @@
                     <thead>
                         <tr>
                             <th>Payment Method</th>
-                            <th>Provider</th>
-                            <th>Reference</th>
+                            <th>Provider &amp; Reference</th>
                             <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
@@ -199,8 +198,12 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $pm->provider }}</td>
-                                <td class="mono" style="color: var(--text-muted); white-space: nowrap;">{{ $pm->account_reference }}</td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-dark);">{{ $pm->provider ?: '—' }}</div>
+                                    @if($pm->account_reference)
+                                        <div class="mono" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">{{ $pm->account_reference }}</div>
+                                    @endif
+                                </td>
                                 <td style="text-align: right;">
                                     <form action="{{ route('settings.payment-methods.destroy', $pm) }}" method="POST">
                                         @csrf
