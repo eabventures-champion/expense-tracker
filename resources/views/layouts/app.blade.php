@@ -1,15 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+@php
+    $earlyAuthId = $user->id ?? auth()->id();
+    $earlyHeaderPrefs = \App\Http\Controllers\ReportAndSettingsController::getUserHeaderPreferences($earlyAuthId);
+    $earlyShowSetupBtn = $earlyHeaderPrefs['show_setup_guide'] ?? true;
+    $earlyShowTourBtn = $earlyHeaderPrefs['show_guided_tour'] ?? true;
+@endphp
+<html lang="en" class="{{ !$earlyShowSetupBtn ? 'hide-topbar-setup-btn' : '' }} {{ !$earlyShowTourBtn ? 'hide-topbar-tour-btn' : '' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'CediLedger — Personal Expense Tracker & Financial Insights Platform')</title>
+    <script>
+        (function () {
+            try {
+                var uid = '{{ $earlyAuthId }}';
+                var hideSetup = localStorage.getItem('cediledger_hide_header_setup_btn_' + uid) === '1'
+                    || localStorage.getItem('cediledger_hide_header_setup_btn') === '1'
+                    || /(?:^|;\s*)cediledger_hide_setup_btn=1(?:;|$)/.test(document.cookie);
+                var hideTour = localStorage.getItem('cediledger_hide_header_tour_btn_' + uid) === '1'
+                    || localStorage.getItem('cediledger_hide_header_tour_btn') === '1'
+                    || /(?:^|;\s*)cediledger_hide_tour_btn=1(?:;|$)/.test(document.cookie);
+                if (hideSetup) document.documentElement.classList.add('hide-topbar-setup-btn');
+                if (hideTour) document.documentElement.classList.add('hide-topbar-tour-btn');
+            } catch (e) {}
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <style>
+        html.hide-topbar-setup-btn #topbarSetupGuideBtn {
+            display: none !important;
+        }
+        html.hide-topbar-tour-btn #topbarGuidedTourBtn {
+            display: none !important;
+        }
         /* ==========================================================================
            MODERN FINTECH DESIGN SYSTEM
            Refined surface hierarchy, rounded cards, subtle borders & mobile drawer
@@ -2511,6 +2538,7 @@
                     <button type="button"
                             id="topbarSetupGuideBtn"
                             class="btn btn-emerald btn-sm"
+                            style="{{ !$earlyShowSetupBtn ? 'display: none;' : '' }}"
                             onclick="openSetupRoadmapModal()"
                             title="View Chronological Fresh-Start Setup Guide">
                         🧭 Setup Guide ({{ $completedSetupCount }}/5)
@@ -2518,6 +2546,7 @@
                     <button type="button"
                             id="topbarGuidedTourBtn"
                             class="btn btn-plum btn-sm"
+                            style="{{ !$earlyShowTourBtn ? 'display: none;' : '' }}"
                             onclick="openGuidedTourModal(0)"
                             title="Launch Interactive Platform Tour">
                         ✦ Guided Tour
@@ -3474,11 +3503,21 @@
         try {
             const setupBtn = document.getElementById('topbarSetupGuideBtn');
             const tourBtn = document.getElementById('topbarGuidedTourBtn');
+            const hideSetup = localStorage.getItem(TOPBAR_SETUP_BTN_HIDE_KEY) === '1'
+                || localStorage.getItem('cediledger_hide_header_setup_btn') === '1'
+                || document.documentElement.classList.contains('hide-topbar-setup-btn');
+            const hideTour = localStorage.getItem(TOPBAR_TOUR_BTN_HIDE_KEY) === '1'
+                || localStorage.getItem('cediledger_hide_header_tour_btn') === '1'
+                || document.documentElement.classList.contains('hide-topbar-tour-btn');
+
+            document.documentElement.classList.toggle('hide-topbar-setup-btn', hideSetup);
+            document.documentElement.classList.toggle('hide-topbar-tour-btn', hideTour);
+
             if (setupBtn) {
-                setupBtn.style.display = localStorage.getItem(TOPBAR_SETUP_BTN_HIDE_KEY) === '1' ? 'none' : '';
+                setupBtn.style.display = hideSetup ? 'none' : '';
             }
             if (tourBtn) {
-                tourBtn.style.display = localStorage.getItem(TOPBAR_TOUR_BTN_HIDE_KEY) === '1' ? 'none' : '';
+                tourBtn.style.display = hideTour ? 'none' : '';
             }
         } catch (e) {}
     }

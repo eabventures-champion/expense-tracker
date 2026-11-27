@@ -97,6 +97,7 @@ Route::middleware('auth')->group(function () {
     // 11. Settings & Payment Methods
     Route::get('/settings', [ReportAndSettingsController::class, 'settings'])->name('settings.index');
     Route::put('/settings', [ReportAndSettingsController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/settings/header-preferences', [ReportAndSettingsController::class, 'updateHeaderPreferences'])->name('settings.header-preferences');
     Route::post('/settings/payment-methods', [ReportAndSettingsController::class, 'storePaymentMethod'])->name('settings.payment-methods.store');
     Route::delete('/settings/payment-methods/{paymentMethod}', [ReportAndSettingsController::class, 'destroyPaymentMethod'])->name('settings.payment-methods.destroy');
 

@@ -90,6 +90,7 @@
                         </div>
                         <input type="checkbox"
                                id="toggle_show_setup_guide_btn"
+                               {{ ($headerPrefs['show_setup_guide'] ?? true) ? 'checked' : '' }}
                                onchange="updateHeaderShortcutVisibility('setup_guide', this.checked)"
                                style="width: 18px; height: 18px; accent-color: var(--emerald); cursor: pointer; flex-shrink: 0;">
                     </label>
@@ -101,6 +102,7 @@
                         </div>
                         <input type="checkbox"
                                id="toggle_show_guided_tour_btn"
+                               {{ ($headerPrefs['show_guided_tour'] ?? true) ? 'checked' : '' }}
                                onchange="updateHeaderShortcutVisibility('guided_tour', this.checked)"
                                style="width: 18px; height: 18px; accent-color: var(--plum); cursor: pointer; flex-shrink: 0;">
                     </label>
@@ -220,36 +222,93 @@
 <script>
     const HEADER_SETUP_BTN_HIDE_KEY = 'cediledger_hide_header_setup_btn_{{ $user->id }}';
     const HEADER_TOUR_BTN_HIDE_KEY = 'cediledger_hide_header_tour_btn_{{ $user->id }}';
+    const SERVER_SHOW_SETUP = @json((bool) ($headerPrefs['show_setup_guide'] ?? true));
+    const SERVER_SHOW_TOUR = @json((bool) ($headerPrefs['show_guided_tour'] ?? true));
+
+    function setHeaderPrefCookie(name, val) {
+        document.cookie = name + '=' + val + '; path=/; max-age=' + (60 * 60 * 24 * 365 * 5) + '; SameSite=Lax';
+    }
 
     function syncHeaderShortcutCheckboxes() {
         const setupCheckbox = document.getElementById('toggle_show_setup_guide_btn');
         const tourCheckbox = document.getElementById('toggle_show_guided_tour_btn');
         try {
-            if (setupCheckbox) {
-                setupCheckbox.checked = localStorage.getItem(HEADER_SETUP_BTN_HIDE_KEY) !== '1';
+            const localHideSetup = localStorage.getItem(HEADER_SETUP_BTN_HIDE_KEY) === '1'
+                || localStorage.getItem('cediledger_hide_header_setup_btn') === '1';
+            const localHideTour = localStorage.getItem(HEADER_TOUR_BTN_HIDE_KEY) === '1'
+                || localStorage.getItem('cediledger_hide_header_tour_btn') === '1';
+
+            const showSetup = SERVER_SHOW_SETUP && !localHideSetup;
+            const showTour = SERVER_SHOW_TOUR && !localHideTour;
+
+            if (setupCheckbox) setupCheckbox.checked = showSetup;
+            if (tourCheckbox) tourCheckbox.checked = showTour;
+
+            // Keep localStorage, cookies, and server in sync if localStorage already hid them
+            if (!showSetup) {
+                localStorage.setItem(HEADER_SETUP_BTN_HIDE_KEY, '1');
+                localStorage.setItem('cediledger_hide_header_setup_btn', '1');
+                setHeaderPrefCookie('cediledger_hide_setup_btn', '1');
             }
-            if (tourCheckbox) {
-                tourCheckbox.checked = localStorage.getItem(HEADER_TOUR_BTN_HIDE_KEY) !== '1';
+            if (!showTour) {
+                localStorage.setItem(HEADER_TOUR_BTN_HIDE_KEY, '1');
+                localStorage.setItem('cediledger_hide_header_tour_btn', '1');
+                setHeaderPrefCookie('cediledger_hide_tour_btn', '1');
             }
+            if ((localHideSetup && SERVER_SHOW_SETUP) || (localHideTour && SERVER_SHOW_TOUR)) {
+                persistHeaderPreferencesToServer(showSetup, showTour);
+            }
+        } catch (e) {}
+    }
+
+    function persistHeaderPreferencesToServer(showSetup, showTour) {
+        try {
+            fetch('{{ route("settings.header-preferences") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({
+                    show_setup_guide: showSetup,
+                    show_guided_tour: showTour
+                })
+            }).catch(function () {});
         } catch (e) {}
     }
 
     function updateHeaderShortcutVisibility(which, shouldShow) {
         try {
             if (which === 'setup_guide') {
+                document.documentElement.classList.toggle('hide-topbar-setup-btn', !shouldShow);
+                setHeaderPrefCookie('cediledger_hide_setup_btn', shouldShow ? '0' : '1');
                 if (shouldShow) {
                     localStorage.removeItem(HEADER_SETUP_BTN_HIDE_KEY);
+                    localStorage.removeItem('cediledger_hide_header_setup_btn');
                 } else {
                     localStorage.setItem(HEADER_SETUP_BTN_HIDE_KEY, '1');
+                    localStorage.setItem('cediledger_hide_header_setup_btn', '1');
                 }
             } else if (which === 'guided_tour') {
+                document.documentElement.classList.toggle('hide-topbar-tour-btn', !shouldShow);
+                setHeaderPrefCookie('cediledger_hide_tour_btn', shouldShow ? '0' : '1');
                 if (shouldShow) {
                     localStorage.removeItem(HEADER_TOUR_BTN_HIDE_KEY);
+                    localStorage.removeItem('cediledger_hide_header_tour_btn');
                 } else {
                     localStorage.setItem(HEADER_TOUR_BTN_HIDE_KEY, '1');
+                    localStorage.setItem('cediledger_hide_header_tour_btn', '1');
                 }
             }
         } catch (e) {}
+
+        const setupCheckbox = document.getElementById('toggle_show_setup_guide_btn');
+        const tourCheckbox = document.getElementById('toggle_show_guided_tour_btn');
+        persistHeaderPreferencesToServer(
+            setupCheckbox ? setupCheckbox.checked : true,
+            tourCheckbox ? tourCheckbox.checked : true
+        );
 
         if (typeof applyTopbarGuideButtonsVisibility === 'function') {
             applyTopbarGuideButtonsVisibility();

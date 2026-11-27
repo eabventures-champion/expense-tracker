@@ -197,6 +197,92 @@ class ReportAndSettingsController extends Controller
     }
 
     /**
+     * Read persistent per-user header button visibility preferences (Setup Guide & Guided Tour).
+     */
+    public static function getUserHeaderPreferences(?int $userId): array
+    {
+        $defaults = [
+            'show_setup_guide' => true,
+            'show_guided_tour' => true,
+        ];
+
+        if (!$userId) {
+            return $defaults;
+        }
+
+        $path = storage_path('app/user_header_preferences.json');
+        if (is_file($path)) {
+            $all = json_decode((string) @file_get_contents($path), true);
+            if (is_array($all) && isset($all[(string) $userId]) && is_array($all[(string) $userId])) {
+                $userPrefs = $all[(string) $userId];
+                return [
+                    'show_setup_guide' => (bool) ($userPrefs['show_setup_guide'] ?? true),
+                    'show_guided_tour' => (bool) ($userPrefs['show_guided_tour'] ?? true),
+                ];
+            }
+        }
+
+        if (request()->hasCookie('cediledger_hide_setup_btn')) {
+            $defaults['show_setup_guide'] = request()->cookie('cediledger_hide_setup_btn') !== '1';
+        }
+        if (request()->hasCookie('cediledger_hide_tour_btn')) {
+            $defaults['show_guided_tour'] = request()->cookie('cediledger_hide_tour_btn') !== '1';
+        }
+
+        return $defaults;
+    }
+
+    /**
+     * Save persistent per-user header button visibility preferences.
+     */
+    public static function saveUserHeaderPreferences(int $userId, bool $showSetupGuide, bool $showGuidedTour): void
+    {
+        $path = storage_path('app/user_header_preferences.json');
+        $all = [];
+        if (is_file($path)) {
+            $decoded = json_decode((string) @file_get_contents($path), true);
+            if (is_array($decoded)) {
+                $all = $decoded;
+            }
+        }
+
+        $all[(string) $userId] = [
+            'show_setup_guide' => $showSetupGuide,
+            'show_guided_tour' => $showGuidedTour,
+            'updated_at' => now()->toIso8601String(),
+        ];
+
+        @file_put_contents($path, json_encode($all, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * AJAX endpoint to persist header button visibility on the server and via long-lived cookies.
+     */
+    public function updateHeaderPreferences(Request $request)
+    {
+        $user = $this->currentUser();
+        $current = self::getUserHeaderPreferences($user->id);
+
+        $showSetup = $request->has('show_setup_guide')
+            ? (bool) $request->boolean('show_setup_guide')
+            : $current['show_setup_guide'];
+
+        $showTour = $request->has('show_guided_tour')
+            ? (bool) $request->boolean('show_guided_tour')
+            : $current['show_guided_tour'];
+
+        self::saveUserHeaderPreferences($user->id, $showSetup, $showTour);
+
+        return response()->json([
+            'ok' => true,
+            'show_setup_guide' => $showSetup,
+            'show_guided_tour' => $showTour,
+        ])
+            ->cookie('cediledger_hide_setup_btn', $showSetup ? '0' : '1', 60 * 24 * 365 * 5, '/')
+            ->cookie('cediledger_hide_tour_btn', $showTour ? '0' : '1', 60 * 24 * 365 * 5, '/');
+    }
+
+    /**
      * 11. SETTINGS & PAYMENT METHODS
      */
     public function settings()
@@ -207,8 +293,9 @@ class ReportAndSettingsController extends Controller
             ->orderBy('sort_order')
             ->get();
         $paymentMethods = PaymentMethod::where('user_id', $user->id)->get();
+        $headerPrefs = self::getUserHeaderPreferences($user->id);
 
-        return view('settings.index', compact('user', 'categories', 'paymentMethods'));
+        return view('settings.index', compact('user', 'categories', 'paymentMethods', 'headerPrefs'));
     }
 
     public function updateSettings(Request $request)
